@@ -21,6 +21,8 @@
     </parent>
 
     <properties>
+  <sonar.organization>ww123321</sonar.organization>
+
         <java.version>17</java.version>
         <mybatis-plus.version>3.5.3.1</mybatis-plus.version>
         <mysql.version>8.0.33</mysql.version>
