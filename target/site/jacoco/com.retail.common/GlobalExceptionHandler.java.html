@@ -17,22 +17,22 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.OK)
     public Result&lt;Void&gt; handleRuntimeException(RuntimeException e) {
-<span class="nc" id="L20">        log.error(&quot;运行时异常: {}&quot;, e.getMessage(), e);</span>
-<span class="nc" id="L21">        return Result.error(500, e.getMessage());</span>
+<span class="fc" id="L20">        log.error(&quot;运行时异常: {}&quot;, e.getMessage(), e);</span>
+<span class="fc" id="L21">        return Result.error(500, e.getMessage());</span>
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.OK)
     public Result&lt;Void&gt; handleIllegalArgumentException(IllegalArgumentException e) {
-<span class="nc" id="L27">        log.warn(&quot;参数校验异常: {}&quot;, e.getMessage());</span>
-<span class="nc" id="L28">        return Result.paramError(e.getMessage());</span>
+<span class="fc" id="L27">        log.warn(&quot;参数校验异常: {}&quot;, e.getMessage());</span>
+<span class="fc" id="L28">        return Result.paramError(e.getMessage());</span>
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.OK)
     public Result&lt;Void&gt; handleException(Exception e) {
-<span class="nc" id="L34">        log.error(&quot;系统异常: {}&quot;, e.getMessage(), e);</span>
-<span class="nc" id="L35">        return Result.error(&quot;系统内部错误&quot;);</span>
+<span class="fc" id="L34">        log.error(&quot;系统异常: {}&quot;, e.getMessage(), e);</span>
+<span class="fc" id="L35">        return Result.error(&quot;系统内部错误&quot;);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

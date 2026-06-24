@@ -22,7 +22,7 @@ public class Product implements Serializable {
      * 商品ID
      */
     @TableId(value = &quot;id&quot;, type = IdType.AUTO)
-<span class="nc" id="L25">    private Long id;</span>
+<span class="fc" id="L25">    private Long id;</span>
 
     /**
      * 商品名称
@@ -34,19 +34,19 @@ public class Product implements Serializable {
      * 商品编码
      */
     @TableField(exist = false)
-<span class="nc" id="L37">    private String code;</span>
+<span class="fc" id="L37">    private String code;</span>
 
     /**
      * 商品描述
      */
     @TableField(&quot;description&quot;)
-<span class="nc" id="L43">    private String description;</span>
+<span class="fc" id="L43">    private String description;</span>
 
     /**
      * 商品价格
      */
     @TableField(&quot;price&quot;)
-<span class="nc" id="L49">    private BigDecimal price;</span>
+<span class="fc" id="L49">    private BigDecimal price;</span>
 
     /**
      * 商品库存
@@ -58,82 +58,82 @@ public class Product implements Serializable {
      * 商品图片URL
      */
     @TableField(&quot;image_url&quot;)
-<span class="nc" id="L61">    private String imageUrl;</span>
+<span class="fc" id="L61">    private String imageUrl;</span>
 
     /**
      * 商品分类：1-电子产品，2-服装，3-食品，4-图书，5-其他
      */
     @TableField(&quot;category&quot;)
-<span class="nc" id="L67">    private Integer category;</span>
+<span class="fc" id="L67">    private Integer category;</span>
 
     /**
      * 商品状态：0-下架，1-上架
      */
     @TableField(&quot;status&quot;)
-<span class="nc" id="L73">    private Integer status;</span>
+<span class="fc" id="L73">    private Integer status;</span>
 
     /**
      * 销量
      */
     @TableField(&quot;sales_count&quot;)
-<span class="nc" id="L79">    private Integer salesCount;</span>
+<span class="fc" id="L79">    private Integer salesCount;</span>
 
     /**
      * 兼容前端sales字段
      */
     public Integer getSales() {
-<span class="nc" id="L85">        return salesCount;</span>
+<span class="fc" id="L85">        return salesCount;</span>
     }
 
     /**
      * 兼容前端sales字段
      */
     public void setSales(Integer sales) {
-<span class="nc" id="L92">        this.salesCount = sales;</span>
-<span class="nc" id="L93">    }</span>
+<span class="fc" id="L92">        this.salesCount = sales;</span>
+<span class="fc" id="L93">    }</span>
 
     /**
      * 创建者ID（管理员）
      */
     @TableField(&quot;create_by&quot;)
-<span class="nc" id="L99">    private Long createBy;</span>
+<span class="fc" id="L99">    private Long createBy;</span>
 
     /**
      * 创建时间
      */
     @TableField(value = &quot;create_time&quot;, fill = FieldFill.INSERT)
-<span class="nc" id="L105">    private LocalDateTime createTime;</span>
+<span class="fc" id="L105">    private LocalDateTime createTime;</span>
 
     /**
      * 更新时间
      */
     @TableField(value = &quot;update_time&quot;, fill = FieldFill.INSERT_UPDATE)
-<span class="nc" id="L111">    private LocalDateTime updateTime;</span>
+<span class="fc" id="L111">    private LocalDateTime updateTime;</span>
 
     /**
      * 逻辑删除：0-未删除，1-已删除
      */
     @TableLogic
     @TableField(&quot;deleted&quot;)
-<span class="nc" id="L118">    private Integer deleted;</span>
+<span class="fc" id="L118">    private Integer deleted;</span>
 
     /**
      * 获取分类名称
      */
     public String getCategoryName() {
-<span class="nc bnc" id="L124" title="All 6 branches missed.">        switch (this.category) {</span>
+<span class="fc bfc" id="L124" title="All 6 branches covered.">        switch (this.category) {</span>
             case 1:
-<span class="nc" id="L126">                return &quot;电子产品&quot;;</span>
+<span class="fc" id="L126">                return &quot;电子产品&quot;;</span>
             case 2:
-<span class="nc" id="L128">                return &quot;服装&quot;;</span>
+<span class="fc" id="L128">                return &quot;服装&quot;;</span>
             case 3:
-<span class="nc" id="L130">                return &quot;食品&quot;;</span>
+<span class="fc" id="L130">                return &quot;食品&quot;;</span>
             case 4:
-<span class="nc" id="L132">                return &quot;图书&quot;;</span>
+<span class="fc" id="L132">                return &quot;图书&quot;;</span>
             case 5:
-<span class="nc" id="L134">                return &quot;其他&quot;;</span>
+<span class="fc" id="L134">                return &quot;其他&quot;;</span>
             default:
-<span class="nc" id="L136">                return &quot;未知&quot;;</span>
+<span class="fc" id="L136">                return &quot;未知&quot;;</span>
         }
     }
 
@@ -141,13 +141,13 @@ public class Product implements Serializable {
      * 获取状态名称
      */
     public String getStatusName() {
-<span class="nc bnc" id="L144" title="All 3 branches missed.">        switch (this.status) {</span>
+<span class="fc bfc" id="L144" title="All 3 branches covered.">        switch (this.status) {</span>
             case 0:
-<span class="nc" id="L146">                return &quot;下架&quot;;</span>
+<span class="fc" id="L146">                return &quot;下架&quot;;</span>
             case 1:
-<span class="nc" id="L148">                return &quot;上架&quot;;</span>
+<span class="fc" id="L148">                return &quot;上架&quot;;</span>
             default:
-<span class="nc" id="L150">                return &quot;未知&quot;;</span>
+<span class="fc" id="L150">                return &quot;未知&quot;;</span>
         }
     }
 }

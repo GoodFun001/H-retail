@@ -16,11 +16,11 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 /**
  * 商品控制器
  */
-<span class="nc" id="L19">@Slf4j</span>
+<span class="fc" id="L19">@Slf4j</span>
 @RestController
 @RequestMapping(&quot;/products&quot;)
 @Tag(name = &quot;商品管理&quot;, description = &quot;商品查询相关接口&quot;)
-<span class="nc" id="L23">public class ProductController {</span>
+<span class="fc" id="L23">public class ProductController {</span>
 
     @Autowired
     private ProductService productService;
@@ -36,11 +36,11 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
             @RequestParam(required = false) String searchKey,
             @RequestParam(required = false) Integer category) {
         try {
-<span class="nc" id="L39">            IPage&lt;Product&gt; products = productService.getProductList(pageNum, pageSize, searchKey, category);</span>
-<span class="nc" id="L40">            return Result.success(products);</span>
-<span class="nc" id="L41">        } catch (Exception e) {</span>
-<span class="nc" id="L42">            log.error(&quot;获取商品列表失败: {}&quot;, e.getMessage(), e);</span>
-<span class="nc" id="L43">            return Result.error(&quot;获取商品列表失败&quot;);</span>
+<span class="fc" id="L39">            IPage&lt;Product&gt; products = productService.getProductList(pageNum, pageSize, searchKey, category);</span>
+<span class="fc" id="L40">            return Result.success(products);</span>
+<span class="fc" id="L41">        } catch (Exception e) {</span>
+<span class="fc" id="L42">            log.error(&quot;获取商品列表失败: {}&quot;, e.getMessage(), e);</span>
+<span class="fc" id="L43">            return Result.error(&quot;获取商品列表失败&quot;);</span>
         }
     }
 
@@ -54,8 +54,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
             @RequestParam(defaultValue = &quot;1&quot;) Integer pageNum,
             @RequestParam(defaultValue = &quot;10&quot;) Integer pageSize) {
         try {
-<span class="nc" id="L57">            IPage&lt;Product&gt; products = productService.getProductList(pageNum, pageSize, keyword, null);</span>
-<span class="nc" id="L58">            return Result.success(products);</span>
+<span class="fc" id="L57">            IPage&lt;Product&gt; products = productService.getProductList(pageNum, pageSize, keyword, null);</span>
+<span class="fc" id="L58">            return Result.success(products);</span>
 <span class="nc" id="L59">        } catch (Exception e) {</span>
 <span class="nc" id="L60">            log.error(&quot;搜索商品失败: {}&quot;, e.getMessage(), e);</span>
 <span class="nc" id="L61">            return Result.error(&quot;搜索商品失败&quot;);</span>
@@ -72,8 +72,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
             @RequestParam(defaultValue = &quot;1&quot;) Integer pageNum,
             @RequestParam(defaultValue = &quot;10&quot;) Integer pageSize) {
         try {
-<span class="nc" id="L75">            IPage&lt;Product&gt; products = productService.getProductList(pageNum, pageSize, null, category);</span>
-<span class="nc" id="L76">            return Result.success(products);</span>
+<span class="fc" id="L75">            IPage&lt;Product&gt; products = productService.getProductList(pageNum, pageSize, null, category);</span>
+<span class="fc" id="L76">            return Result.success(products);</span>
 <span class="nc" id="L77">        } catch (Exception e) {</span>
 <span class="nc" id="L78">            log.error(&quot;按分类获取商品失败: {}&quot;, e.getMessage(), e);</span>
 <span class="nc" id="L79">            return Result.error(&quot;按分类获取商品失败&quot;);</span>
@@ -154,11 +154,11 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
     public Result&lt;Product&gt; getProductById(
             @Parameter(description = &quot;商品ID&quot;, required = true) @PathVariable Long id) {
         try {
-<span class="nc" id="L157">            Product product = productService.getProductDetail(id);</span>
-<span class="nc bnc" id="L158" title="All 2 branches missed.">            if (product != null) {</span>
-<span class="nc" id="L159">                return Result.success(product);</span>
+<span class="fc" id="L157">            Product product = productService.getProductDetail(id);</span>
+<span class="fc bfc" id="L158" title="All 2 branches covered.">            if (product != null) {</span>
+<span class="fc" id="L159">                return Result.success(product);</span>
             } else {
-<span class="nc" id="L161">                return Result.error(&quot;商品不存在&quot;);</span>
+<span class="fc" id="L161">                return Result.error(&quot;商品不存在&quot;);</span>
             }
 <span class="nc" id="L163">        } catch (Exception e) {</span>
 <span class="nc" id="L164">            log.error(&quot;获取商品详情失败: {}&quot;, e.getMessage(), e);</span>

@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 /**
  * 用户实体类
  */
-<span class="nc" id="L13">@Data</span>
+<span class="pc" id="L13">@Data</span>
 <span class="nc bnc" id="L14" title="All 110 branches missed.">@EqualsAndHashCode(callSuper = false)</span>
 @TableName(&quot;user&quot;)
 public class User implements Serializable {
@@ -21,79 +21,79 @@ public class User implements Serializable {
      * 用户ID
      */
     @TableId(value = &quot;id&quot;, type = IdType.AUTO)
-<span class="nc" id="L24">    private Long id;</span>
+<span class="fc" id="L24">    private Long id;</span>
 
     /**
      * 用户名
      */
     @TableField(&quot;username&quot;)
-<span class="nc" id="L30">    private String username;</span>
+<span class="fc" id="L30">    private String username;</span>
 
     /**
      * 密码（BCrypt加密）
      */
     @TableField(&quot;password&quot;)
-<span class="nc" id="L36">    private String password;</span>
+<span class="fc" id="L36">    private String password;</span>
 
     /**
      * 手机号
      */
     @TableField(&quot;phone&quot;)
-<span class="nc" id="L42">    private String phone;</span>
+<span class="fc" id="L42">    private String phone;</span>
 
     /**
      * 邮箱
      */
     @TableField(&quot;email&quot;)
-<span class="nc" id="L48">    private String email;</span>
+<span class="fc" id="L48">    private String email;</span>
 
     /**
      * 用户类型：0-普通用户，1-VIP用户，2-管理员
      */
     @TableField(&quot;user_type&quot;)
-<span class="nc" id="L54">    private Integer userType;</span>
+<span class="fc" id="L54">    private Integer userType;</span>
 
     /**
      * 用户状态：0-禁用，1-启用
      */
     @TableField(&quot;status&quot;)
-<span class="nc" id="L60">    private Integer status;</span>
+<span class="fc" id="L60">    private Integer status;</span>
 
     /**
      * 真实姓名
      */
     @TableField(&quot;real_name&quot;)
-<span class="nc" id="L66">    private String realName;</span>
+<span class="fc" id="L66">    private String realName;</span>
 
     /**
      * 头像URL
      */
     @TableField(&quot;avatar&quot;)
-<span class="nc" id="L72">    private String avatar;</span>
+<span class="fc" id="L72">    private String avatar;</span>
 
     /**
      * VIP到期时间
      */
     @TableField(&quot;vip_expire_time&quot;)
-<span class="nc" id="L78">    private LocalDateTime vipExpireTime;</span>
+<span class="fc" id="L78">    private LocalDateTime vipExpireTime;</span>
 
     /**
      * 注册时间
      */
     @TableField(value = &quot;create_time&quot;, fill = FieldFill.INSERT)
-<span class="nc" id="L84">    private LocalDateTime createTime;</span>
+<span class="fc" id="L84">    private LocalDateTime createTime;</span>
 
     /**
      * 更新时间
      */
     @TableField(value = &quot;update_time&quot;, fill = FieldFill.INSERT_UPDATE)
-<span class="nc" id="L90">    private LocalDateTime updateTime;</span>
+<span class="fc" id="L90">    private LocalDateTime updateTime;</span>
 
     /**
      * 逻辑删除：0-未删除，1-已删除
      */
     @TableLogic
     @TableField(&quot;deleted&quot;)
-<span class="nc" id="L97">    private Integer deleted;</span>
+<span class="fc" id="L97">    private Integer deleted;</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

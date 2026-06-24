@@ -11,35 +11,35 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-<span class="nc" id="L14">public class OpenApiConfig {</span>
+<span class="fc" id="L14">public class OpenApiConfig {</span>
 
     @Bean
     public OpenAPI customOpenAPI() {
-<span class="nc" id="L18">        return new OpenAPI()</span>
-<span class="nc" id="L19">                .info(new Info()</span>
-<span class="nc" id="L20">                        .title(&quot;在线零售平台 API&quot;)</span>
-<span class="nc" id="L21">                        .description(&quot;在线零售平台后端API接口文档&quot;)</span>
-<span class="nc" id="L22">                        .version(&quot;1.0.0&quot;)</span>
-<span class="nc" id="L23">                        .contact(new Contact()</span>
-<span class="nc" id="L24">                                .name(&quot;开发团队&quot;)</span>
-<span class="nc" id="L25">                                .email(&quot;dev@retail.com&quot;)</span>
-<span class="nc" id="L26">                                .url(&quot;https://www.retail.com&quot;))</span>
-<span class="nc" id="L27">                        .license(new License()</span>
-<span class="nc" id="L28">                                .name(&quot;Apache 2.0&quot;)</span>
-<span class="nc" id="L29">                                .url(&quot;https://www.apache.org/licenses/LICENSE-2.0&quot;)))</span>
-<span class="nc" id="L30">                .externalDocs(new ExternalDocumentation()</span>
-<span class="nc" id="L31">                        .description(&quot;项目文档&quot;)</span>
-<span class="nc" id="L32">                        .url(&quot;https://www.retail.com/docs&quot;))</span>
-<span class="nc" id="L33">                .addSecurityItem(new SecurityRequirement().addList(&quot;Bearer Authentication&quot;))</span>
-<span class="nc" id="L34">                .components(new io.swagger.v3.oas.models.Components()</span>
-<span class="nc" id="L35">                        .addSecuritySchemes(&quot;Bearer Authentication&quot;, createAPIKeyScheme()));</span>
+<span class="fc" id="L18">        return new OpenAPI()</span>
+<span class="fc" id="L19">                .info(new Info()</span>
+<span class="fc" id="L20">                        .title(&quot;在线零售平台 API&quot;)</span>
+<span class="fc" id="L21">                        .description(&quot;在线零售平台后端API接口文档&quot;)</span>
+<span class="fc" id="L22">                        .version(&quot;1.0.0&quot;)</span>
+<span class="fc" id="L23">                        .contact(new Contact()</span>
+<span class="fc" id="L24">                                .name(&quot;开发团队&quot;)</span>
+<span class="fc" id="L25">                                .email(&quot;dev@retail.com&quot;)</span>
+<span class="fc" id="L26">                                .url(&quot;https://www.retail.com&quot;))</span>
+<span class="fc" id="L27">                        .license(new License()</span>
+<span class="fc" id="L28">                                .name(&quot;Apache 2.0&quot;)</span>
+<span class="fc" id="L29">                                .url(&quot;https://www.apache.org/licenses/LICENSE-2.0&quot;)))</span>
+<span class="fc" id="L30">                .externalDocs(new ExternalDocumentation()</span>
+<span class="fc" id="L31">                        .description(&quot;项目文档&quot;)</span>
+<span class="fc" id="L32">                        .url(&quot;https://www.retail.com/docs&quot;))</span>
+<span class="fc" id="L33">                .addSecurityItem(new SecurityRequirement().addList(&quot;Bearer Authentication&quot;))</span>
+<span class="fc" id="L34">                .components(new io.swagger.v3.oas.models.Components()</span>
+<span class="fc" id="L35">                        .addSecuritySchemes(&quot;Bearer Authentication&quot;, createAPIKeyScheme()));</span>
     }
 
     private SecurityScheme createAPIKeyScheme() {
-<span class="nc" id="L39">        return new SecurityScheme()</span>
-<span class="nc" id="L40">                .type(SecurityScheme.Type.HTTP)</span>
-<span class="nc" id="L41">                .bearerFormat(&quot;JWT&quot;)</span>
-<span class="nc" id="L42">                .scheme(&quot;bearer&quot;);</span>
+<span class="fc" id="L39">        return new SecurityScheme()</span>
+<span class="fc" id="L40">                .type(SecurityScheme.Type.HTTP)</span>
+<span class="fc" id="L41">                .bearerFormat(&quot;JWT&quot;)</span>
+<span class="fc" id="L42">                .scheme(&quot;bearer&quot;);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

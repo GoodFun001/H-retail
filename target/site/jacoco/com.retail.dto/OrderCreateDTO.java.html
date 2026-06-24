@@ -11,21 +11,21 @@ import java.util.List;
 /**
  * 创建订单DTO
  */
-<span class="nc bnc" id="L14" title="All 38 branches missed.">@Data</span>
+<span class="pc bnc" id="L14" title="All 38 branches missed.">@Data</span>
 @Schema(description = &quot;创建订单请求&quot;)
 public class OrderCreateDTO {
 
     @NotNull(message = &quot;收货地址不能为空&quot;)
     @Schema(description = &quot;收货地址ID&quot;)
-<span class="nc" id="L20">    private Long addressId;</span>
+<span class="fc" id="L20">    private Long addressId;</span>
 
     @Valid
     @NotEmpty(message = &quot;订单项不能为空&quot;)
     @Schema(description = &quot;订单项列表&quot;)
-<span class="nc" id="L25">    private List&lt;OrderItemDTO&gt; items;</span>
+<span class="fc" id="L25">    private List&lt;OrderItemDTO&gt; items;</span>
 
     @Schema(description = &quot;订单备注&quot;)
-<span class="nc" id="L28">    private String remarks;</span>
+<span class="fc" id="L28">    private String remarks;</span>
 
     @Schema(description = &quot;优惠券ID&quot;)
 <span class="nc" id="L31">    private Long couponId;</span>
@@ -33,13 +33,13 @@ public class OrderCreateDTO {
     /**
      * 订单项DTO
      */
-<span class="nc bnc" id="L36" title="All 22 branches missed.">    @Data</span>
+<span class="pc bnc" id="L36" title="All 22 branches missed.">    @Data</span>
     @Schema(description = &quot;订单项&quot;)
     public static class OrderItemDTO {
 
         @NotNull(message = &quot;产品ID不能为空&quot;)
         @Schema(description = &quot;产品ID&quot;)
-<span class="nc" id="L42">        private Long productId;</span>
+<span class="fc" id="L42">        private Long productId;</span>
 
         @NotNull(message = &quot;数量不能为空&quot;)
         @Schema(description = &quot;购买数量&quot;, minimum = &quot;1&quot;)

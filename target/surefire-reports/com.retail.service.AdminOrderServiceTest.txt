@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: com.retail.service.AdminOrderServiceTest
 -------------------------------------------------------------------------------
-Tests run: 16, Failures: 0, Errors: 0, Skipped: 1, Time elapsed: 0.06 s - in com.retail.service.AdminOrderServiceTest
+Tests run: 16, Failures: 0, Errors: 0, Skipped: 1, Time elapsed: 0.019 s - in com.retail.service.AdminOrderServiceTest

@@ -25,9 +25,9 @@ import java.util.concurrent.TimeUnit;
  * 【重构说明】引入Repository层，Service通过ProductRepository访问数据，
  * 不再直接依赖ProductMapper，符合分层架构原则。
  */
-<span class="nc" id="L28">@Slf4j</span>
+<span class="fc" id="L28">@Slf4j</span>
 @Service
-<span class="nc" id="L30">public class ProductServiceImpl extends ServiceImpl&lt;ProductMapper, Product&gt; implements ProductService {</span>
+<span class="fc" id="L30">public class ProductServiceImpl extends ServiceImpl&lt;ProductMapper, Product&gt; implements ProductService {</span>
 
     @Autowired
     private ProductRepository productRepository;
@@ -52,54 +52,54 @@ import java.util.concurrent.TimeUnit;
     @Override
     public IPage&lt;Product&gt; getProductList(Integer pageNum, Integer pageSize, String searchKey, Integer category) {
         try {
-<span class="nc" id="L55">            log.info(&quot;开始查询商品列表: pageNum={}, pageSize={}, searchKey={}, category={}&quot;, pageNum, pageSize, searchKey, category);</span>
+<span class="fc" id="L55">            log.info(&quot;开始查询商品列表: pageNum={}, pageSize={}, searchKey={}, category={}&quot;, pageNum, pageSize, searchKey, category);</span>
             
-<span class="nc bnc" id="L57" title="All 4 branches missed.">            Page&lt;Product&gt; page = new Page&lt;&gt;(pageNum != null ? pageNum : 1, pageSize != null ? pageSize : 10);</span>
+<span class="pc bpc" id="L57" title="2 of 4 branches missed.">            Page&lt;Product&gt; page = new Page&lt;&gt;(pageNum != null ? pageNum : 1, pageSize != null ? pageSize : 10);</span>
             
-<span class="nc" id="L59">            LambdaQueryWrapper&lt;Product&gt; wrapper = new LambdaQueryWrapper&lt;&gt;();</span>
+<span class="fc" id="L59">            LambdaQueryWrapper&lt;Product&gt; wrapper = new LambdaQueryWrapper&lt;&gt;();</span>
             
             // 搜索条件
-<span class="nc bnc" id="L62" title="All 4 branches missed.">            if (searchKey != null &amp;&amp; !searchKey.trim().isEmpty()) {</span>
-<span class="nc" id="L63">                wrapper.and(w -&gt; w.like(Product::getName, searchKey)</span>
-<span class="nc" id="L64">                                  .or()</span>
-<span class="nc" id="L65">                                  .like(Product::getDescription, searchKey));</span>
-<span class="nc" id="L66">                log.info(&quot;添加搜索条件: {}&quot;, searchKey);</span>
+<span class="pc bpc" id="L62" title="1 of 4 branches missed.">            if (searchKey != null &amp;&amp; !searchKey.trim().isEmpty()) {</span>
+<span class="fc" id="L63">                wrapper.and(w -&gt; w.like(Product::getName, searchKey)</span>
+<span class="fc" id="L64">                                  .or()</span>
+<span class="fc" id="L65">                                  .like(Product::getDescription, searchKey));</span>
+<span class="fc" id="L66">                log.info(&quot;添加搜索条件: {}&quot;, searchKey);</span>
             }
             
             // 分类条件
-<span class="nc bnc" id="L70" title="All 2 branches missed.">            if (category != null) {</span>
-<span class="nc" id="L71">                wrapper.eq(Product::getCategory, category);</span>
-<span class="nc" id="L72">                log.info(&quot;添加分类条件: {}&quot;, category);</span>
+<span class="fc bfc" id="L70" title="All 2 branches covered.">            if (category != null) {</span>
+<span class="fc" id="L71">                wrapper.eq(Product::getCategory, category);</span>
+<span class="fc" id="L72">                log.info(&quot;添加分类条件: {}&quot;, category);</span>
             }
             
             // 只查询上架商品
-<span class="nc" id="L76">            wrapper.eq(Product::getStatus, 1);</span>
-<span class="nc" id="L77">            log.info(&quot;添加状态条件: 只查询上架商品(status=1)&quot;);</span>
+<span class="fc" id="L76">            wrapper.eq(Product::getStatus, 1);</span>
+<span class="fc" id="L77">            log.info(&quot;添加状态条件: 只查询上架商品(status=1)&quot;);</span>
             
             // 按创建时间降序
-<span class="nc" id="L80">            wrapper.orderByDesc(Product::getCreateTime);</span>
-<span class="nc" id="L81">            log.info(&quot;添加排序条件: 按创建时间降序&quot;);</span>
+<span class="fc" id="L80">            wrapper.orderByDesc(Product::getCreateTime);</span>
+<span class="fc" id="L81">            log.info(&quot;添加排序条件: 按创建时间降序&quot;);</span>
             
             // 先尝试使用非分页查询，查看是否能获取到数据
-<span class="nc" id="L84">            List&lt;Product&gt; allProducts = productRepository.selectList(wrapper);</span>
-<span class="nc bnc" id="L85" title="All 2 branches missed.">            log.info(&quot;非分页查询结果数量: {}&quot;, allProducts != null ? allProducts.size() : 0);</span>
+<span class="fc" id="L84">            List&lt;Product&gt; allProducts = productRepository.selectList(wrapper);</span>
+<span class="pc bpc" id="L85" title="1 of 2 branches missed.">            log.info(&quot;非分页查询结果数量: {}&quot;, allProducts != null ? allProducts.size() : 0);</span>
             
-<span class="nc" id="L87">            IPage&lt;Product&gt; result = productRepository.selectPage(page, wrapper);</span>
-<span class="nc" id="L88">            log.info(&quot;分页查询结果: total={}, records={}&quot;, result.getTotal(), result.getRecords().size());</span>
+<span class="fc" id="L87">            IPage&lt;Product&gt; result = productRepository.selectPage(page, wrapper);</span>
+<span class="fc" id="L88">            log.info(&quot;分页查询结果: total={}, records={}&quot;, result.getTotal(), result.getRecords().size());</span>
             
             // 检查是否有记录
-<span class="nc bnc" id="L91" title="All 2 branches missed.">            if (result.getRecords().isEmpty()) {</span>
+<span class="pc bpc" id="L91" title="1 of 2 branches missed.">            if (result.getRecords().isEmpty()) {</span>
 <span class="nc" id="L92">                log.warn(&quot;分页查询返回空列表&quot;);</span>
                 // 尝试不使用分页插件直接查询
 <span class="nc" id="L94">                List&lt;Product&gt; directProducts = productRepository.selectListDirect(wrapper);</span>
 <span class="nc bnc" id="L95" title="All 2 branches missed.">                log.info(&quot;直接查询结果数量: {}&quot;, directProducts != null ? directProducts.size() : 0);</span>
             }
             
-<span class="nc" id="L98">            return result;</span>
-<span class="nc" id="L99">        } catch (Exception e) {</span>
-<span class="nc" id="L100">            log.error(&quot;查询商品列表失败: {}&quot;, e.getMessage(), e);</span>
+<span class="fc" id="L98">            return result;</span>
+<span class="fc" id="L99">        } catch (Exception e) {</span>
+<span class="fc" id="L100">            log.error(&quot;查询商品列表失败: {}&quot;, e.getMessage(), e);</span>
             // 发生异常时返回空的Page对象而不是null，确保前端能正常处理
-<span class="nc bnc" id="L102" title="All 4 branches missed.">            return new Page&lt;&gt;(pageNum != null ? pageNum : 1, pageSize != null ? pageSize : 10);</span>
+<span class="pc bpc" id="L102" title="2 of 4 branches missed.">            return new Page&lt;&gt;(pageNum != null ? pageNum : 1, pageSize != null ? pageSize : 10);</span>
         }
     }
 
@@ -107,72 +107,72 @@ import java.util.concurrent.TimeUnit;
     public Product getProductDetail(Long productId) {
         try {
             // 先从缓存获取
-<span class="nc" id="L110">            String cacheKey = &quot;product:detail:&quot; + productId;</span>
-<span class="nc" id="L111">            Product product = (Product) redisUtil.get(cacheKey);</span>
+<span class="fc" id="L110">            String cacheKey = &quot;product:detail:&quot; + productId;</span>
+<span class="fc" id="L111">            Product product = (Product) redisUtil.get(cacheKey);</span>
             
-<span class="nc bnc" id="L113" title="All 2 branches missed.">            if (product != null) {</span>
-<span class="nc" id="L114">                log.info(&quot;从缓存获取商品详情: productId={}&quot;, productId);</span>
-<span class="nc" id="L115">                return product;</span>
+<span class="fc bfc" id="L113" title="All 2 branches covered.">            if (product != null) {</span>
+<span class="fc" id="L114">                log.info(&quot;从缓存获取商品详情: productId={}&quot;, productId);</span>
+<span class="fc" id="L115">                return product;</span>
             }
             
             // 缓存未命中，通过Repository查询数据库
-<span class="nc" id="L119">            product = productRepository.findById(productId);</span>
-<span class="nc bnc" id="L120" title="All 4 branches missed.">            if (product != null &amp;&amp; product.getStatus() == 1) {</span>
+<span class="fc" id="L119">            product = productRepository.findById(productId);</span>
+<span class="pc bpc" id="L120" title="1 of 4 branches missed.">            if (product != null &amp;&amp; product.getStatus() == 1) {</span>
                 // 缓存商品详情，缓存5分钟
-<span class="nc" id="L122">                redisUtil.set(cacheKey, product, 5, TimeUnit.MINUTES);</span>
-<span class="nc" id="L123">                log.info(&quot;从数据库获取商品详情并缓存: productId={}&quot;, productId);</span>
+<span class="fc" id="L122">                redisUtil.set(cacheKey, product, 5, TimeUnit.MINUTES);</span>
+<span class="fc" id="L123">                log.info(&quot;从数据库获取商品详情并缓存: productId={}&quot;, productId);</span>
             }
             
-<span class="nc" id="L126">            return product;</span>
-<span class="nc" id="L127">        } catch (Exception e) {</span>
-<span class="nc" id="L128">            log.error(&quot;获取商品详情失败: productId={}, error={}&quot;, productId, e.getMessage(), e);</span>
-<span class="nc" id="L129">            return null;</span>
+<span class="fc" id="L126">            return product;</span>
+<span class="fc" id="L127">        } catch (Exception e) {</span>
+<span class="fc" id="L128">            log.error(&quot;获取商品详情失败: productId={}, error={}&quot;, productId, e.getMessage(), e);</span>
+<span class="fc" id="L129">            return null;</span>
         }
     }
 
     @Override
     public boolean createProduct(Product product, Long adminId) {
         try {
-<span class="nc" id="L136">            product.setCreateBy(adminId);</span>
-<span class="nc" id="L137">            product.setStatus(1); // 默认上架</span>
-<span class="nc" id="L138">            product.setSalesCount(0); // 初始销量为0</span>
+<span class="fc" id="L136">            product.setCreateBy(adminId);</span>
+<span class="fc" id="L137">            product.setStatus(1); // 默认上架</span>
+<span class="fc" id="L138">            product.setSalesCount(0); // 初始销量为0</span>
             
-<span class="nc" id="L140">            boolean result = productRepository.save(product);</span>
-<span class="nc bnc" id="L141" title="All 2 branches missed.">            if (result) {</span>
-<span class="nc" id="L142">                log.info(&quot;创建商品成功: productId={}, name={}&quot;, product.getId(), product.getName());</span>
+<span class="fc" id="L140">            boolean result = productRepository.save(product);</span>
+<span class="pc bpc" id="L141" title="1 of 2 branches missed.">            if (result) {</span>
+<span class="fc" id="L142">                log.info(&quot;创建商品成功: productId={}, name={}&quot;, product.getId(), product.getName());</span>
                 // 清除热点商品缓存
-<span class="nc" id="L144">                refreshHotProductsCache();</span>
+<span class="fc" id="L144">                refreshHotProductsCache();</span>
             }
-<span class="nc" id="L146">            return result;</span>
-<span class="nc" id="L147">        } catch (Exception e) {</span>
-<span class="nc" id="L148">            log.error(&quot;创建商品失败: {}&quot;, e.getMessage(), e);</span>
-<span class="nc" id="L149">            return false;</span>
+<span class="fc" id="L146">            return result;</span>
+<span class="fc" id="L147">        } catch (Exception e) {</span>
+<span class="fc" id="L148">            log.error(&quot;创建商品失败: {}&quot;, e.getMessage(), e);</span>
+<span class="fc" id="L149">            return false;</span>
         }
     }
 
     @Override
     public boolean updateProduct(Product product, Long adminId) {
         try {
-<span class="nc" id="L156">            Product existingProduct = productRepository.findById(product.getId());</span>
-<span class="nc bnc" id="L157" title="All 2 branches missed.">            if (existingProduct == null) {</span>
-<span class="nc" id="L158">                log.warn(&quot;商品不存在: productId={}&quot;, product.getId());</span>
-<span class="nc" id="L159">                return false;</span>
+<span class="fc" id="L156">            Product existingProduct = productRepository.findById(product.getId());</span>
+<span class="fc bfc" id="L157" title="All 2 branches covered.">            if (existingProduct == null) {</span>
+<span class="fc" id="L158">                log.warn(&quot;商品不存在: productId={}&quot;, product.getId());</span>
+<span class="fc" id="L159">                return false;</span>
             }
             
             // 检查权限
-<span class="nc bnc" id="L163" title="All 2 branches missed.">            if (!adminId.equals(existingProduct.getCreateBy())) {</span>
-<span class="nc" id="L164">                log.warn(&quot;无权限修改商品: productId={}, adminId={}&quot;, product.getId(), adminId);</span>
-<span class="nc" id="L165">                return false;</span>
+<span class="fc bfc" id="L163" title="All 2 branches covered.">            if (!adminId.equals(existingProduct.getCreateBy())) {</span>
+<span class="fc" id="L164">                log.warn(&quot;无权限修改商品: productId={}, adminId={}&quot;, product.getId(), adminId);</span>
+<span class="fc" id="L165">                return false;</span>
             }
             
-<span class="nc" id="L168">            boolean result = productRepository.update(product);</span>
-<span class="nc bnc" id="L169" title="All 2 branches missed.">            if (result) {</span>
-<span class="nc" id="L170">                log.info(&quot;更新商品成功: productId={}&quot;, product.getId());</span>
+<span class="fc" id="L168">            boolean result = productRepository.update(product);</span>
+<span class="pc bpc" id="L169" title="1 of 2 branches missed.">            if (result) {</span>
+<span class="fc" id="L170">                log.info(&quot;更新商品成功: productId={}&quot;, product.getId());</span>
                 // 清除相关缓存
-<span class="nc" id="L172">                clearProductCache(product.getId());</span>
-<span class="nc" id="L173">                refreshHotProductsCache();</span>
+<span class="fc" id="L172">                clearProductCache(product.getId());</span>
+<span class="fc" id="L173">                refreshHotProductsCache();</span>
             }
-<span class="nc" id="L175">            return result;</span>
+<span class="fc" id="L175">            return result;</span>
 <span class="nc" id="L176">        } catch (Exception e) {</span>
 <span class="nc" id="L177">            log.error(&quot;更新商品失败: {}&quot;, e.getMessage(), e);</span>
 <span class="nc" id="L178">            return false;</span>
@@ -182,26 +182,26 @@ import java.util.concurrent.TimeUnit;
     @Override
     public boolean deleteProduct(Long productId, Long adminId) {
         try {
-<span class="nc" id="L185">            Product product = productRepository.findById(productId);</span>
-<span class="nc bnc" id="L186" title="All 2 branches missed.">            if (product == null) {</span>
+<span class="fc" id="L185">            Product product = productRepository.findById(productId);</span>
+<span class="pc bpc" id="L186" title="1 of 2 branches missed.">            if (product == null) {</span>
 <span class="nc" id="L187">                log.warn(&quot;商品不存在: productId={}&quot;, productId);</span>
 <span class="nc" id="L188">                return false;</span>
             }
             
             // 检查权限
-<span class="nc bnc" id="L192" title="All 2 branches missed.">            if (!adminId.equals(product.getCreateBy())) {</span>
-<span class="nc" id="L193">                log.warn(&quot;无权限删除商品: productId={}, adminId={}&quot;, productId, adminId);</span>
-<span class="nc" id="L194">                return false;</span>
+<span class="fc bfc" id="L192" title="All 2 branches covered.">            if (!adminId.equals(product.getCreateBy())) {</span>
+<span class="fc" id="L193">                log.warn(&quot;无权限删除商品: productId={}, adminId={}&quot;, productId, adminId);</span>
+<span class="fc" id="L194">                return false;</span>
             }
             
-<span class="nc" id="L197">            boolean result = productRepository.deleteById(productId);</span>
-<span class="nc bnc" id="L198" title="All 2 branches missed.">            if (result) {</span>
-<span class="nc" id="L199">                log.info(&quot;删除商品成功: productId={}&quot;, productId);</span>
+<span class="fc" id="L197">            boolean result = productRepository.deleteById(productId);</span>
+<span class="pc bpc" id="L198" title="1 of 2 branches missed.">            if (result) {</span>
+<span class="fc" id="L199">                log.info(&quot;删除商品成功: productId={}&quot;, productId);</span>
                 // 清除相关缓存
-<span class="nc" id="L201">                clearProductCache(productId);</span>
-<span class="nc" id="L202">                refreshHotProductsCache();</span>
+<span class="fc" id="L201">                clearProductCache(productId);</span>
+<span class="fc" id="L202">                refreshHotProductsCache();</span>
             }
-<span class="nc" id="L204">            return result;</span>
+<span class="fc" id="L204">            return result;</span>
 <span class="nc" id="L205">        } catch (Exception e) {</span>
 <span class="nc" id="L206">            log.error(&quot;删除商品失败: {}&quot;, e.getMessage(), e);</span>
 <span class="nc" id="L207">            return false;</span>
@@ -213,29 +213,29 @@ import java.util.concurrent.TimeUnit;
     public List&lt;Product&gt; getHotProducts() {
         try {
             // 先从缓存获取
-<span class="nc" id="L216">            String cacheData = redisUtil.getString(HOT_PRODUCT_CACHE_KEY);</span>
-<span class="nc bnc" id="L217" title="All 2 branches missed.">            if (cacheData != null) {</span>
-<span class="nc" id="L218">                log.info(&quot;从缓存获取热点商品&quot;);</span>
-<span class="nc" id="L219">                return JSON.parseArray(cacheData, Product.class);</span>
+<span class="fc" id="L216">            String cacheData = redisUtil.getString(HOT_PRODUCT_CACHE_KEY);</span>
+<span class="fc bfc" id="L217" title="All 2 branches covered.">            if (cacheData != null) {</span>
+<span class="fc" id="L218">                log.info(&quot;从缓存获取热点商品&quot;);</span>
+<span class="fc" id="L219">                return JSON.parseArray(cacheData, Product.class);</span>
             }
             
             // 缓存未命中，通过Repository查询数据库
-<span class="nc" id="L223">            LambdaQueryWrapper&lt;Product&gt; wrapper = new LambdaQueryWrapper&lt;&gt;();</span>
-<span class="nc" id="L224">            wrapper.eq(Product::getStatus, 1)</span>
-<span class="nc" id="L225">                   .orderByDesc(Product::getSalesCount)</span>
-<span class="nc" id="L226">                   .last(&quot;LIMIT &quot; + hotProductLimit);</span>
+<span class="fc" id="L223">            LambdaQueryWrapper&lt;Product&gt; wrapper = new LambdaQueryWrapper&lt;&gt;();</span>
+<span class="fc" id="L224">            wrapper.eq(Product::getStatus, 1)</span>
+<span class="fc" id="L225">                   .orderByDesc(Product::getSalesCount)</span>
+<span class="fc" id="L226">                   .last(&quot;LIMIT &quot; + hotProductLimit);</span>
             
-<span class="nc" id="L228">            List&lt;Product&gt; hotProducts = productRepository.selectList(wrapper);</span>
+<span class="fc" id="L228">            List&lt;Product&gt; hotProducts = productRepository.selectList(wrapper);</span>
             
             // 缓存热点商品
-<span class="nc" id="L231">            redisUtil.setString(HOT_PRODUCT_CACHE_KEY, JSON.toJSONString(hotProducts), </span>
-<span class="nc" id="L232">                           hotProductCacheTime, TimeUnit.MINUTES);</span>
+<span class="fc" id="L231">            redisUtil.setString(HOT_PRODUCT_CACHE_KEY, JSON.toJSONString(hotProducts), </span>
+<span class="fc" id="L232">                           hotProductCacheTime, TimeUnit.MINUTES);</span>
             
-<span class="nc" id="L234">            log.info(&quot;从数据库获取热点商品并缓存: 数量={}&quot;, hotProducts.size());</span>
-<span class="nc" id="L235">            return hotProducts;</span>
-<span class="nc" id="L236">        } catch (Exception e) {</span>
-<span class="nc" id="L237">            log.error(&quot;获取热点商品失败: {}&quot;, e.getMessage(), e);</span>
-<span class="nc" id="L238">            return null;</span>
+<span class="fc" id="L234">            log.info(&quot;从数据库获取热点商品并缓存: 数量={}&quot;, hotProducts.size());</span>
+<span class="fc" id="L235">            return hotProducts;</span>
+<span class="fc" id="L236">        } catch (Exception e) {</span>
+<span class="fc" id="L237">            log.error(&quot;获取热点商品失败: {}&quot;, e.getMessage(), e);</span>
+<span class="fc" id="L238">            return null;</span>
         }
     }
 
@@ -243,39 +243,39 @@ import java.util.concurrent.TimeUnit;
     public void refreshHotProductsCache() {
         try {
             // 删除缓存
-<span class="nc" id="L246">            redisUtil.delete(HOT_PRODUCT_CACHE_KEY);</span>
-<span class="nc" id="L247">            log.info(&quot;清除热点商品缓存&quot;);</span>
+<span class="fc" id="L246">            redisUtil.delete(HOT_PRODUCT_CACHE_KEY);</span>
+<span class="fc" id="L247">            log.info(&quot;清除热点商品缓存&quot;);</span>
 <span class="nc" id="L248">        } catch (Exception e) {</span>
 <span class="nc" id="L249">            log.error(&quot;刷新热点商品缓存失败: {}&quot;, e.getMessage(), e);</span>
-<span class="nc" id="L250">        }</span>
-<span class="nc" id="L251">    }</span>
+<span class="fc" id="L250">        }</span>
+<span class="fc" id="L251">    }</span>
 
     @Override
     public Product calculateVipPrice(Product product, boolean isVip) {
-<span class="nc bnc" id="L255" title="All 2 branches missed.">        if (product == null) {</span>
-<span class="nc" id="L256">            return null;</span>
+<span class="fc bfc" id="L255" title="All 2 branches covered.">        if (product == null) {</span>
+<span class="fc" id="L256">            return null;</span>
         }
         
-<span class="nc bnc" id="L259" title="All 4 branches missed.">        if (isVip &amp;&amp; vipDiscountRate != null) {</span>
+<span class="pc bpc" id="L259" title="1 of 4 branches missed.">        if (isVip &amp;&amp; vipDiscountRate != null) {</span>
             // 创建副本避免修改原对象
-<span class="nc" id="L261">            Product vipProduct = new Product();</span>
-<span class="nc" id="L262">            vipProduct.setId(product.getId());</span>
-<span class="nc" id="L263">            vipProduct.setName(product.getName());</span>
-<span class="nc" id="L264">            vipProduct.setDescription(product.getDescription());</span>
-<span class="nc" id="L265">            vipProduct.setPrice(product.getPrice().multiply(BigDecimal.valueOf(vipDiscountRate)));</span>
-<span class="nc" id="L266">            vipProduct.setStock(product.getStock());</span>
-<span class="nc" id="L267">            vipProduct.setImageUrl(product.getImageUrl());</span>
-<span class="nc" id="L268">            vipProduct.setCategory(product.getCategory());</span>
-<span class="nc" id="L269">            vipProduct.setStatus(product.getStatus());</span>
-<span class="nc" id="L270">            vipProduct.setSalesCount(product.getSalesCount());</span>
-<span class="nc" id="L271">            vipProduct.setCreateBy(product.getCreateBy());</span>
-<span class="nc" id="L272">            vipProduct.setCreateTime(product.getCreateTime());</span>
-<span class="nc" id="L273">            vipProduct.setUpdateTime(product.getUpdateTime());</span>
+<span class="fc" id="L261">            Product vipProduct = new Product();</span>
+<span class="fc" id="L262">            vipProduct.setId(product.getId());</span>
+<span class="fc" id="L263">            vipProduct.setName(product.getName());</span>
+<span class="fc" id="L264">            vipProduct.setDescription(product.getDescription());</span>
+<span class="fc" id="L265">            vipProduct.setPrice(product.getPrice().multiply(BigDecimal.valueOf(vipDiscountRate)));</span>
+<span class="fc" id="L266">            vipProduct.setStock(product.getStock());</span>
+<span class="fc" id="L267">            vipProduct.setImageUrl(product.getImageUrl());</span>
+<span class="fc" id="L268">            vipProduct.setCategory(product.getCategory());</span>
+<span class="fc" id="L269">            vipProduct.setStatus(product.getStatus());</span>
+<span class="fc" id="L270">            vipProduct.setSalesCount(product.getSalesCount());</span>
+<span class="fc" id="L271">            vipProduct.setCreateBy(product.getCreateBy());</span>
+<span class="fc" id="L272">            vipProduct.setCreateTime(product.getCreateTime());</span>
+<span class="fc" id="L273">            vipProduct.setUpdateTime(product.getUpdateTime());</span>
             
-<span class="nc" id="L275">            return vipProduct;</span>
+<span class="fc" id="L275">            return vipProduct;</span>
         }
         
-<span class="nc" id="L278">        return product;</span>
+<span class="fc" id="L278">        return product;</span>
     }
 
     /**
@@ -283,12 +283,12 @@ import java.util.concurrent.TimeUnit;
      */
     private void clearProductCache(Long productId) {
         try {
-<span class="nc" id="L286">            String detailCacheKey = &quot;product:detail:&quot; + productId;</span>
-<span class="nc" id="L287">            redisUtil.delete(detailCacheKey);</span>
-<span class="nc" id="L288">            log.info(&quot;清除商品缓存: productId={}&quot;, productId);</span>
+<span class="fc" id="L286">            String detailCacheKey = &quot;product:detail:&quot; + productId;</span>
+<span class="fc" id="L287">            redisUtil.delete(detailCacheKey);</span>
+<span class="fc" id="L288">            log.info(&quot;清除商品缓存: productId={}&quot;, productId);</span>
 <span class="nc" id="L289">        } catch (Exception e) {</span>
 <span class="nc" id="L290">            log.error(&quot;清除商品缓存失败: {}&quot;, e.getMessage(), e);</span>
-<span class="nc" id="L291">        }</span>
-<span class="nc" id="L292">    }</span>
+<span class="fc" id="L291">        }</span>
+<span class="fc" id="L292">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

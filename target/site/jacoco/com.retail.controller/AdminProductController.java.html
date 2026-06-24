@@ -23,8 +23,8 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping(&quot;/admin/products&quot;)
-<span class="nc" id="L26">@RequiredArgsConstructor</span>
-<span class="nc" id="L27">@Slf4j</span>
+<span class="fc" id="L26">@RequiredArgsConstructor</span>
+<span class="fc" id="L27">@Slf4j</span>
 @Tag(name = &quot;管理员商品管理&quot;, description = &quot;管理员对商品进行管理的相关接口&quot;)
 public class AdminProductController {
 
@@ -39,12 +39,12 @@ public class AdminProductController {
             @RequestParam(defaultValue = &quot;1&quot;) Integer pageNum,
             @RequestParam(defaultValue = &quot;10&quot;) Integer pageSize) {
         try {
-<span class="nc" id="L42">            Page&lt;Product&gt; page = new Page&lt;&gt;(pageNum, pageSize);</span>
-<span class="nc" id="L43">            IPage&lt;Product&gt; productList = productService.page(page);</span>
-<span class="nc" id="L44">            return Result.success(productList);</span>
-<span class="nc" id="L45">        } catch (Exception e) {</span>
-<span class="nc" id="L46">            log.error(&quot;获取商品列表失败: {}&quot;, e.getMessage(), e);</span>
-<span class="nc" id="L47">            return Result.error(&quot;获取商品列表失败&quot;);</span>
+<span class="fc" id="L42">            Page&lt;Product&gt; page = new Page&lt;&gt;(pageNum, pageSize);</span>
+<span class="fc" id="L43">            IPage&lt;Product&gt; productList = productService.page(page);</span>
+<span class="fc" id="L44">            return Result.success(productList);</span>
+<span class="fc" id="L45">        } catch (Exception e) {</span>
+<span class="fc" id="L46">            log.error(&quot;获取商品列表失败: {}&quot;, e.getMessage(), e);</span>
+<span class="fc" id="L47">            return Result.error(&quot;获取商品列表失败&quot;);</span>
         }
     }
 
@@ -58,11 +58,11 @@ public class AdminProductController {
             @RequestParam(defaultValue = &quot;1&quot;) Integer pageNum,
             @RequestParam(defaultValue = &quot;10&quot;) Integer pageSize) {
         try {
-<span class="nc" id="L61">            IPage&lt;Product&gt; productList = productService.getProductList(pageNum, pageSize, keyword, null);</span>
-<span class="nc" id="L62">            return Result.success(productList);</span>
-<span class="nc" id="L63">        } catch (Exception e) {</span>
-<span class="nc" id="L64">            log.error(&quot;搜索商品失败: {}&quot;, e.getMessage(), e);</span>
-<span class="nc" id="L65">            return Result.error(&quot;搜索商品失败&quot;);</span>
+<span class="fc" id="L61">            IPage&lt;Product&gt; productList = productService.getProductList(pageNum, pageSize, keyword, null);</span>
+<span class="fc" id="L62">            return Result.success(productList);</span>
+<span class="fc" id="L63">        } catch (Exception e) {</span>
+<span class="fc" id="L64">            log.error(&quot;搜索商品失败: {}&quot;, e.getMessage(), e);</span>
+<span class="fc" id="L65">            return Result.error(&quot;搜索商品失败&quot;);</span>
         }
     }
 
@@ -74,16 +74,16 @@ public class AdminProductController {
     public Result&lt;String&gt; createProduct(@Valid @RequestBody Product product, HttpServletRequest request) {
         try {
             // 暂时使用固定的管理员ID，实际项目中应该从JWT token中获取
-<span class="nc" id="L77">            Long adminId = 1L;</span>
-<span class="nc" id="L78">            boolean success = productService.createProduct(product, adminId);</span>
-<span class="nc bnc" id="L79" title="All 2 branches missed.">            if (success) {</span>
-<span class="nc" id="L80">                return Result.success(&quot;创建商品成功&quot;);</span>
+<span class="fc" id="L77">            Long adminId = 1L;</span>
+<span class="fc" id="L78">            boolean success = productService.createProduct(product, adminId);</span>
+<span class="fc bfc" id="L79" title="All 2 branches covered.">            if (success) {</span>
+<span class="fc" id="L80">                return Result.success(&quot;创建商品成功&quot;);</span>
             } else {
-<span class="nc" id="L82">                return Result.error(&quot;创建商品失败&quot;);</span>
+<span class="fc" id="L82">                return Result.error(&quot;创建商品失败&quot;);</span>
             }
-<span class="nc" id="L84">        } catch (Exception e) {</span>
-<span class="nc" id="L85">            log.error(&quot;创建商品失败: {}&quot;, e.getMessage(), e);</span>
-<span class="nc" id="L86">            return Result.error(&quot;创建商品失败&quot;);</span>
+<span class="fc" id="L84">        } catch (Exception e) {</span>
+<span class="fc" id="L85">            log.error(&quot;创建商品失败: {}&quot;, e.getMessage(), e);</span>
+<span class="fc" id="L86">            return Result.error(&quot;创建商品失败&quot;);</span>
         }
     }
 
@@ -95,15 +95,15 @@ public class AdminProductController {
     public Result&lt;Product&gt; getProductDetail(
             @Parameter(description = &quot;商品ID&quot;, required = true) @PathVariable Long id) {
         try {
-<span class="nc" id="L98">            Product product = productService.getProductDetail(id);</span>
-<span class="nc bnc" id="L99" title="All 2 branches missed.">            if (product != null) {</span>
-<span class="nc" id="L100">                return Result.success(product);</span>
+<span class="fc" id="L98">            Product product = productService.getProductDetail(id);</span>
+<span class="fc bfc" id="L99" title="All 2 branches covered.">            if (product != null) {</span>
+<span class="fc" id="L100">                return Result.success(product);</span>
             } else {
-<span class="nc" id="L102">                return Result.error(&quot;商品不存在&quot;);</span>
+<span class="fc" id="L102">                return Result.error(&quot;商品不存在&quot;);</span>
             }
-<span class="nc" id="L104">        } catch (Exception e) {</span>
-<span class="nc" id="L105">            log.error(&quot;获取商品详情失败: {}&quot;, e.getMessage(), e);</span>
-<span class="nc" id="L106">            return Result.error(&quot;获取商品详情失败&quot;);</span>
+<span class="fc" id="L104">        } catch (Exception e) {</span>
+<span class="fc" id="L105">            log.error(&quot;获取商品详情失败: {}&quot;, e.getMessage(), e);</span>
+<span class="fc" id="L106">            return Result.error(&quot;获取商品详情失败&quot;);</span>
         }
     }
 
@@ -117,17 +117,17 @@ public class AdminProductController {
             @Valid @RequestBody Product product, HttpServletRequest request) {
         try {
             // 暂时使用固定的管理员ID，实际项目中应该从JWT token中获取
-<span class="nc" id="L120">            Long adminId = 1L;</span>
-<span class="nc" id="L121">            product.setId(id);</span>
-<span class="nc" id="L122">            boolean success = productService.updateProduct(product, adminId);</span>
-<span class="nc bnc" id="L123" title="All 2 branches missed.">            if (success) {</span>
-<span class="nc" id="L124">                return Result.success(&quot;更新商品成功&quot;);</span>
+<span class="fc" id="L120">            Long adminId = 1L;</span>
+<span class="fc" id="L121">            product.setId(id);</span>
+<span class="fc" id="L122">            boolean success = productService.updateProduct(product, adminId);</span>
+<span class="fc bfc" id="L123" title="All 2 branches covered.">            if (success) {</span>
+<span class="fc" id="L124">                return Result.success(&quot;更新商品成功&quot;);</span>
             } else {
-<span class="nc" id="L126">                return Result.error(&quot;更新商品失败&quot;);</span>
+<span class="fc" id="L126">                return Result.error(&quot;更新商品失败&quot;);</span>
             }
-<span class="nc" id="L128">        } catch (Exception e) {</span>
-<span class="nc" id="L129">            log.error(&quot;更新商品失败: {}&quot;, e.getMessage(), e);</span>
-<span class="nc" id="L130">            return Result.error(&quot;更新商品失败&quot;);</span>
+<span class="fc" id="L128">        } catch (Exception e) {</span>
+<span class="fc" id="L129">            log.error(&quot;更新商品失败: {}&quot;, e.getMessage(), e);</span>
+<span class="fc" id="L130">            return Result.error(&quot;更新商品失败&quot;);</span>
         }
     }
 
@@ -140,16 +140,16 @@ public class AdminProductController {
             @Parameter(description = &quot;商品ID&quot;, required = true) @PathVariable Long id, HttpServletRequest request) {
         try {
             // 暂时使用固定的管理员ID，实际项目中应该从JWT token中获取
-<span class="nc" id="L143">            Long adminId = 1L;</span>
-<span class="nc" id="L144">            boolean success = productService.deleteProduct(id, adminId);</span>
-<span class="nc bnc" id="L145" title="All 2 branches missed.">            if (success) {</span>
-<span class="nc" id="L146">                return Result.success(&quot;删除商品成功&quot;);</span>
+<span class="fc" id="L143">            Long adminId = 1L;</span>
+<span class="fc" id="L144">            boolean success = productService.deleteProduct(id, adminId);</span>
+<span class="fc bfc" id="L145" title="All 2 branches covered.">            if (success) {</span>
+<span class="fc" id="L146">                return Result.success(&quot;删除商品成功&quot;);</span>
             } else {
-<span class="nc" id="L148">                return Result.error(&quot;删除商品失败&quot;);</span>
+<span class="fc" id="L148">                return Result.error(&quot;删除商品失败&quot;);</span>
             }
-<span class="nc" id="L150">        } catch (Exception e) {</span>
-<span class="nc" id="L151">            log.error(&quot;删除商品失败: {}&quot;, e.getMessage(), e);</span>
-<span class="nc" id="L152">            return Result.error(&quot;删除商品失败&quot;);</span>
+<span class="fc" id="L150">        } catch (Exception e) {</span>
+<span class="fc" id="L151">            log.error(&quot;删除商品失败: {}&quot;, e.getMessage(), e);</span>
+<span class="fc" id="L152">            return Result.error(&quot;删除商品失败&quot;);</span>
         }
     }
 
@@ -162,17 +162,17 @@ public class AdminProductController {
             @Parameter(description = &quot;商品ID&quot;, required = true) @PathVariable Long id,
             @RequestParam Integer stock) {
         try {
-<span class="nc" id="L165">            Product product = productService.getById(id);</span>
-<span class="nc bnc" id="L166" title="All 2 branches missed.">            if (product != null) {</span>
-<span class="nc" id="L167">                product.setStock(stock);</span>
-<span class="nc" id="L168">                productService.updateById(product);</span>
-<span class="nc" id="L169">                return Result.success(&quot;更新商品库存成功&quot;);</span>
+<span class="fc" id="L165">            Product product = productService.getById(id);</span>
+<span class="fc bfc" id="L166" title="All 2 branches covered.">            if (product != null) {</span>
+<span class="fc" id="L167">                product.setStock(stock);</span>
+<span class="fc" id="L168">                productService.updateById(product);</span>
+<span class="fc" id="L169">                return Result.success(&quot;更新商品库存成功&quot;);</span>
             } else {
-<span class="nc" id="L171">                return Result.error(&quot;商品不存在&quot;);</span>
+<span class="fc" id="L171">                return Result.error(&quot;商品不存在&quot;);</span>
             }
-<span class="nc" id="L173">        } catch (Exception e) {</span>
-<span class="nc" id="L174">            log.error(&quot;更新商品库存失败: {}&quot;, e.getMessage(), e);</span>
-<span class="nc" id="L175">            return Result.error(&quot;更新商品库存失败&quot;);</span>
+<span class="fc" id="L173">        } catch (Exception e) {</span>
+<span class="fc" id="L174">            log.error(&quot;更新商品库存失败: {}&quot;, e.getMessage(), e);</span>
+<span class="fc" id="L175">            return Result.error(&quot;更新商品库存失败&quot;);</span>
         }
     }
 
@@ -185,17 +185,17 @@ public class AdminProductController {
             @Parameter(description = &quot;商品ID&quot;, required = true) @PathVariable Long id,
             @RequestParam Integer status) {
         try {
-<span class="nc" id="L188">            Product product = productService.getById(id);</span>
-<span class="nc bnc" id="L189" title="All 2 branches missed.">            if (product != null) {</span>
-<span class="nc" id="L190">                product.setStatus(status);</span>
-<span class="nc" id="L191">                productService.updateById(product);</span>
-<span class="nc" id="L192">                return Result.success(&quot;更新商品状态成功&quot;);</span>
+<span class="fc" id="L188">            Product product = productService.getById(id);</span>
+<span class="fc bfc" id="L189" title="All 2 branches covered.">            if (product != null) {</span>
+<span class="fc" id="L190">                product.setStatus(status);</span>
+<span class="fc" id="L191">                productService.updateById(product);</span>
+<span class="fc" id="L192">                return Result.success(&quot;更新商品状态成功&quot;);</span>
             } else {
-<span class="nc" id="L194">                return Result.error(&quot;商品不存在&quot;);</span>
+<span class="fc" id="L194">                return Result.error(&quot;商品不存在&quot;);</span>
             }
-<span class="nc" id="L196">        } catch (Exception e) {</span>
-<span class="nc" id="L197">            log.error(&quot;更新商品状态失败: {}&quot;, e.getMessage(), e);</span>
-<span class="nc" id="L198">            return Result.error(&quot;更新商品状态失败&quot;);</span>
+<span class="fc" id="L196">        } catch (Exception e) {</span>
+<span class="fc" id="L197">            log.error(&quot;更新商品状态失败: {}&quot;, e.getMessage(), e);</span>
+<span class="fc" id="L198">            return Result.error(&quot;更新商品状态失败&quot;);</span>
         }
     }
 
@@ -206,20 +206,20 @@ public class AdminProductController {
     @Operation(summary = &quot;批量更新商品库存&quot;, description = &quot;管理员批量更新商品库存&quot;)
     public Result&lt;String&gt; batchUpdateProductStock(@RequestBody List&lt;Map&lt;String, Object&gt;&gt; productStockList) {
         try {
-<span class="nc" id="L209">            List&lt;Product&gt; products = productStockList.stream().map(map -&gt; {</span>
-<span class="nc" id="L210">                Long id = Long.valueOf(map.get(&quot;id&quot;).toString());</span>
-<span class="nc" id="L211">                Integer stock = Integer.valueOf(map.get(&quot;stock&quot;).toString());</span>
-<span class="nc" id="L212">                Product product = new Product();</span>
-<span class="nc" id="L213">                product.setId(id);</span>
-<span class="nc" id="L214">                product.setStock(stock);</span>
-<span class="nc" id="L215">                return product;</span>
-<span class="nc" id="L216">            }).collect(Collectors.toList());</span>
+<span class="fc" id="L209">            List&lt;Product&gt; products = productStockList.stream().map(map -&gt; {</span>
+<span class="fc" id="L210">                Long id = Long.valueOf(map.get(&quot;id&quot;).toString());</span>
+<span class="fc" id="L211">                Integer stock = Integer.valueOf(map.get(&quot;stock&quot;).toString());</span>
+<span class="fc" id="L212">                Product product = new Product();</span>
+<span class="fc" id="L213">                product.setId(id);</span>
+<span class="fc" id="L214">                product.setStock(stock);</span>
+<span class="fc" id="L215">                return product;</span>
+<span class="fc" id="L216">            }).collect(Collectors.toList());</span>
             
-<span class="nc" id="L218">            productService.updateBatchById(products);</span>
-<span class="nc" id="L219">            return Result.success(&quot;批量更新商品库存成功&quot;);</span>
-<span class="nc" id="L220">        } catch (Exception e) {</span>
-<span class="nc" id="L221">            log.error(&quot;批量更新商品库存失败: {}&quot;, e.getMessage(), e);</span>
-<span class="nc" id="L222">            return Result.error(&quot;批量更新商品库存失败&quot;);</span>
+<span class="fc" id="L218">            productService.updateBatchById(products);</span>
+<span class="fc" id="L219">            return Result.success(&quot;批量更新商品库存成功&quot;);</span>
+<span class="fc" id="L220">        } catch (Exception e) {</span>
+<span class="fc" id="L221">            log.error(&quot;批量更新商品库存失败: {}&quot;, e.getMessage(), e);</span>
+<span class="fc" id="L222">            return Result.error(&quot;批量更新商品库存失败&quot;);</span>
         }
     }
 
@@ -230,20 +230,20 @@ public class AdminProductController {
     @Operation(summary = &quot;批量更新商品状态&quot;, description = &quot;管理员批量更新商品状态&quot;)
     public Result&lt;String&gt; batchUpdateProductStatus(@RequestBody List&lt;Map&lt;String, Object&gt;&gt; productStatusList) {
         try {
-<span class="nc" id="L233">            List&lt;Product&gt; products = productStatusList.stream().map(map -&gt; {</span>
-<span class="nc" id="L234">                Long id = Long.valueOf(map.get(&quot;id&quot;).toString());</span>
-<span class="nc" id="L235">                Integer status = Integer.valueOf(map.get(&quot;status&quot;).toString());</span>
-<span class="nc" id="L236">                Product product = new Product();</span>
-<span class="nc" id="L237">                product.setId(id);</span>
-<span class="nc" id="L238">                product.setStatus(status);</span>
-<span class="nc" id="L239">                return product;</span>
-<span class="nc" id="L240">            }).collect(Collectors.toList());</span>
+<span class="fc" id="L233">            List&lt;Product&gt; products = productStatusList.stream().map(map -&gt; {</span>
+<span class="fc" id="L234">                Long id = Long.valueOf(map.get(&quot;id&quot;).toString());</span>
+<span class="fc" id="L235">                Integer status = Integer.valueOf(map.get(&quot;status&quot;).toString());</span>
+<span class="fc" id="L236">                Product product = new Product();</span>
+<span class="fc" id="L237">                product.setId(id);</span>
+<span class="fc" id="L238">                product.setStatus(status);</span>
+<span class="fc" id="L239">                return product;</span>
+<span class="fc" id="L240">            }).collect(Collectors.toList());</span>
             
-<span class="nc" id="L242">            productService.updateBatchById(products);</span>
-<span class="nc" id="L243">            return Result.success(&quot;批量更新商品状态成功&quot;);</span>
-<span class="nc" id="L244">        } catch (Exception e) {</span>
-<span class="nc" id="L245">            log.error(&quot;批量更新商品状态失败: {}&quot;, e.getMessage(), e);</span>
-<span class="nc" id="L246">            return Result.error(&quot;批量更新商品状态失败&quot;);</span>
+<span class="fc" id="L242">            productService.updateBatchById(products);</span>
+<span class="fc" id="L243">            return Result.success(&quot;批量更新商品状态成功&quot;);</span>
+<span class="fc" id="L244">        } catch (Exception e) {</span>
+<span class="fc" id="L245">            log.error(&quot;批量更新商品状态失败: {}&quot;, e.getMessage(), e);</span>
+<span class="fc" id="L246">            return Result.error(&quot;批量更新商品状态失败&quot;);</span>
         }
     }
 }

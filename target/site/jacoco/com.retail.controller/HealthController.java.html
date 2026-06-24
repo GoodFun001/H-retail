@@ -10,16 +10,16 @@ import java.util.Map;
 
 @RestController
 @RequestMapping(&quot;/&quot;)
-<span class="nc" id="L13">public class HealthController {</span>
+<span class="fc" id="L13">public class HealthController {</span>
 
     @GetMapping(&quot;/health&quot;)
     public Result&lt;Map&lt;String, Object&gt;&gt; health() {
-<span class="nc" id="L17">        Map&lt;String, Object&gt; health = new HashMap&lt;&gt;();</span>
-<span class="nc" id="L18">        health.put(&quot;status&quot;, &quot;UP&quot;);</span>
-<span class="nc" id="L19">        health.put(&quot;timestamp&quot;, System.currentTimeMillis());</span>
-<span class="nc" id="L20">        health.put(&quot;service&quot;, &quot;retail-platform&quot;);</span>
+<span class="fc" id="L17">        Map&lt;String, Object&gt; health = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L18">        health.put(&quot;status&quot;, &quot;UP&quot;);</span>
+<span class="fc" id="L19">        health.put(&quot;timestamp&quot;, System.currentTimeMillis());</span>
+<span class="fc" id="L20">        health.put(&quot;service&quot;, &quot;retail-platform&quot;);</span>
         
-<span class="nc" id="L22">        return Result.success(health);</span>
+<span class="fc" id="L22">        return Result.success(health);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

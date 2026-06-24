@@ -15,9 +15,9 @@ import java.util.List;
  * 订单Repository层
  * 封装OrderMapper的数据访问操作，提供业务语义化的数据查询方法
  */
-<span class="nc" id="L18">@Slf4j</span>
+<span class="fc" id="L18">@Slf4j</span>
 @Repository
-<span class="nc" id="L20">@RequiredArgsConstructor</span>
+<span class="fc" id="L20">@RequiredArgsConstructor</span>
 public class OrderRepository {
 
     private final OrderMapper orderMapper;
@@ -26,42 +26,42 @@ public class OrderRepository {
      * 创建订单（使用XML中的自定义SQL）
      */
     public int insert(Order order) {
-<span class="nc" id="L29">        return orderMapper.createOrder(order);</span>
+<span class="fc" id="L29">        return orderMapper.createOrder(order);</span>
     }
 
     /**
      * 根据ID查询订单（使用XML中的自定义SQL）
      */
     public Order findById(Long id) {
-<span class="nc" id="L36">        return orderMapper.getOrderById(id);</span>
+<span class="fc" id="L36">        return orderMapper.getOrderById(id);</span>
     }
 
     /**
      * 根据用户ID查询订单列表
      */
     public List&lt;Order&gt; findByUserId(Long userId) {
-<span class="nc" id="L43">        return orderMapper.getOrdersByUserId(userId);</span>
+<span class="fc" id="L43">        return orderMapper.getOrdersByUserId(userId);</span>
     }
 
     /**
      * 更新订单状态
      */
     public int updateStatus(Long id, Integer status) {
-<span class="nc" id="L50">        return orderMapper.updateOrderStatus(id, status);</span>
+<span class="fc" id="L50">        return orderMapper.updateOrderStatus(id, status);</span>
     }
 
     /**
      * 删除订单（逻辑删除）
      */
     public int deleteById(Long id) {
-<span class="nc" id="L57">        return orderMapper.deleteOrder(id);</span>
+<span class="fc" id="L57">        return orderMapper.deleteOrder(id);</span>
     }
 
     /**
      * 查询所有订单
      */
     public List&lt;Order&gt; findAll() {
-<span class="nc" id="L64">        return orderMapper.getAllOrders();</span>
+<span class="fc" id="L64">        return orderMapper.getAllOrders();</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

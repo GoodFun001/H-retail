@@ -24,12 +24,12 @@ import java.util.concurrent.TimeUnit;
 /**
  * 用户控制器
  */
-<span class="nc" id="L27">@Slf4j</span>
+<span class="fc" id="L27">@Slf4j</span>
 @RestController
 @RequestMapping(&quot;/user&quot;)
 @Validated
 @Tag(name = &quot;用户管理&quot;, description = &quot;用户注册、登录、信息管理相关接口&quot;)
-<span class="nc" id="L32">public class UserController {</span>
+<span class="fc" id="L32">public class UserController {</span>
 
     @Autowired
     private UserService userService;
@@ -47,15 +47,15 @@ import java.util.concurrent.TimeUnit;
     @Operation(summary = &quot;用户注册&quot;, description = &quot;新用户注册接口&quot;)
     public Result&lt;String&gt; register(@Valid @RequestBody User user) {
         try {
-<span class="nc" id="L50">            boolean success = userService.register(user);</span>
-<span class="nc bnc" id="L51" title="All 2 branches missed.">            if (success) {</span>
-<span class="nc" id="L52">                return Result.success(&quot;注册成功&quot;);</span>
+<span class="fc" id="L50">            boolean success = userService.register(user);</span>
+<span class="fc bfc" id="L51" title="All 2 branches covered.">            if (success) {</span>
+<span class="fc" id="L52">                return Result.success(&quot;注册成功&quot;);</span>
             } else {
-<span class="nc" id="L54">                return Result.error(400, &quot;注册失败，用户名或手机号已存在&quot;);</span>
+<span class="fc" id="L54">                return Result.error(400, &quot;注册失败，用户名或手机号已存在&quot;);</span>
             }
-<span class="nc" id="L56">        } catch (Exception e) {</span>
-<span class="nc" id="L57">            log.error(&quot;用户注册异常: {}&quot;, e.getMessage(), e);</span>
-<span class="nc" id="L58">            return Result.error(&quot;注册失败，请稍后重试&quot;);</span>
+<span class="fc" id="L56">        } catch (Exception e) {</span>
+<span class="fc" id="L57">            log.error(&quot;用户注册异常: {}&quot;, e.getMessage(), e);</span>
+<span class="fc" id="L58">            return Result.error(&quot;注册失败，请稍后重试&quot;);</span>
         }
     }
 
@@ -112,13 +112,13 @@ import java.util.concurrent.TimeUnit;
     @Operation(summary = &quot;获取用户信息&quot;, description = &quot;获取当前登录用户的详细信息&quot;)
     public Result&lt;User&gt; getUserInfo() {
         try {
-<span class="nc" id="L115">            User user = getCurrentUser();</span>
-<span class="nc bnc" id="L116" title="All 2 branches missed.">            if (user != null) {</span>
+<span class="fc" id="L115">            User user = getCurrentUser();</span>
+<span class="fc bfc" id="L116" title="All 2 branches covered.">            if (user != null) {</span>
                 // 清除敏感信息
-<span class="nc" id="L118">                user.setPassword(null);</span>
-<span class="nc" id="L119">                return Result.success(user);</span>
+<span class="fc" id="L118">                user.setPassword(null);</span>
+<span class="fc" id="L119">                return Result.success(user);</span>
             } else {
-<span class="nc" id="L121">                return Result.unauthorized(&quot;用户未登录&quot;);</span>
+<span class="fc" id="L121">                return Result.unauthorized(&quot;用户未登录&quot;);</span>
             }
 <span class="nc" id="L123">        } catch (Exception e) {</span>
 <span class="nc" id="L124">            log.error(&quot;获取用户信息异常: {}&quot;, e.getMessage(), e);</span>
@@ -133,23 +133,23 @@ import java.util.concurrent.TimeUnit;
     @Operation(summary = &quot;更新用户信息&quot;, description = &quot;更新当前登录用户的信息&quot;)
     public Result&lt;String&gt; updateUserInfo(@Valid @RequestBody User user) {
         try {
-<span class="nc" id="L136">            User currentUser = getCurrentUser();</span>
-<span class="nc bnc" id="L137" title="All 2 branches missed.">            if (currentUser == null) {</span>
-<span class="nc" id="L138">                return Result.unauthorized(&quot;用户未登录&quot;);</span>
+<span class="fc" id="L136">            User currentUser = getCurrentUser();</span>
+<span class="fc bfc" id="L137" title="All 2 branches covered.">            if (currentUser == null) {</span>
+<span class="fc" id="L138">                return Result.unauthorized(&quot;用户未登录&quot;);</span>
             }
 
             // 设置用户ID，防止修改其他用户信息
-<span class="nc" id="L142">            user.setId(currentUser.getId());</span>
+<span class="fc" id="L142">            user.setId(currentUser.getId());</span>
             
-<span class="nc" id="L144">            boolean success = userService.updateUserInfo(user);</span>
-<span class="nc bnc" id="L145" title="All 2 branches missed.">            if (success) {</span>
-<span class="nc" id="L146">                return Result.success(&quot;更新成功&quot;);</span>
+<span class="fc" id="L144">            boolean success = userService.updateUserInfo(user);</span>
+<span class="fc bfc" id="L145" title="All 2 branches covered.">            if (success) {</span>
+<span class="fc" id="L146">                return Result.success(&quot;更新成功&quot;);</span>
             } else {
-<span class="nc" id="L148">                return Result.error(&quot;更新失败&quot;);</span>
+<span class="fc" id="L148">                return Result.error(&quot;更新失败&quot;);</span>
             }
-<span class="nc" id="L150">        } catch (Exception e) {</span>
-<span class="nc" id="L151">            log.error(&quot;更新用户信息异常: {}&quot;, e.getMessage(), e);</span>
-<span class="nc" id="L152">            return Result.error(&quot;更新失败，请稍后重试&quot;);</span>
+<span class="fc" id="L150">        } catch (Exception e) {</span>
+<span class="fc" id="L151">            log.error(&quot;更新用户信息异常: {}&quot;, e.getMessage(), e);</span>
+<span class="fc" id="L152">            return Result.error(&quot;更新失败，请稍后重试&quot;);</span>
         }
     }
 
@@ -160,25 +160,25 @@ import java.util.concurrent.TimeUnit;
     @Operation(summary = &quot;升级VIP&quot;, description = &quot;将当前用户升级为VIP用户&quot;)
     public Result&lt;String&gt; upgradeVip() {
         try {
-<span class="nc" id="L163">            User currentUser = getCurrentUser();</span>
-<span class="nc bnc" id="L164" title="All 2 branches missed.">            if (currentUser == null) {</span>
-<span class="nc" id="L165">                return Result.unauthorized(&quot;用户未登录&quot;);</span>
+<span class="fc" id="L163">            User currentUser = getCurrentUser();</span>
+<span class="fc bfc" id="L164" title="All 2 branches covered.">            if (currentUser == null) {</span>
+<span class="fc" id="L165">                return Result.unauthorized(&quot;用户未登录&quot;);</span>
             }
 
             // 检查是否已经是VIP
-<span class="nc bnc" id="L169" title="All 2 branches missed.">            if (userService.isVipUser(currentUser.getId())) {</span>
-<span class="nc" id="L170">                return Result.error(&quot;您已经是VIP用户&quot;);</span>
+<span class="fc bfc" id="L169" title="All 2 branches covered.">            if (userService.isVipUser(currentUser.getId())) {</span>
+<span class="fc" id="L170">                return Result.error(&quot;您已经是VIP用户&quot;);</span>
             }
 
-<span class="nc" id="L173">            boolean success = userService.upgradeVip(currentUser.getId());</span>
-<span class="nc bnc" id="L174" title="All 2 branches missed.">            if (success) {</span>
-<span class="nc" id="L175">                return Result.success(&quot;升级VIP成功&quot;);</span>
+<span class="fc" id="L173">            boolean success = userService.upgradeVip(currentUser.getId());</span>
+<span class="fc bfc" id="L174" title="All 2 branches covered.">            if (success) {</span>
+<span class="fc" id="L175">                return Result.success(&quot;升级VIP成功&quot;);</span>
             } else {
-<span class="nc" id="L177">                return Result.error(&quot;升级VIP失败&quot;);</span>
+<span class="fc" id="L177">                return Result.error(&quot;升级VIP失败&quot;);</span>
             }
-<span class="nc" id="L179">        } catch (Exception e) {</span>
-<span class="nc" id="L180">            log.error(&quot;升级VIP异常: {}&quot;, e.getMessage(), e);</span>
-<span class="nc" id="L181">            return Result.error(&quot;升级VIP失败，请稍后重试&quot;);</span>
+<span class="fc" id="L179">        } catch (Exception e) {</span>
+<span class="fc" id="L180">            log.error(&quot;升级VIP异常: {}&quot;, e.getMessage(), e);</span>
+<span class="fc" id="L181">            return Result.error(&quot;升级VIP失败，请稍后重试&quot;);</span>
         }
     }
 
@@ -189,17 +189,17 @@ import java.util.concurrent.TimeUnit;
     @Operation(summary = &quot;退出登录&quot;, description = &quot;用户退出登录，清除会话信息&quot;)
     public Result&lt;String&gt; logout(HttpServletRequest request) {
         try {
-<span class="nc" id="L192">            String token = getTokenFromRequest(request);</span>
-<span class="nc bnc" id="L193" title="All 2 branches missed.">            if (token != null) {</span>
+<span class="fc" id="L192">            String token = getTokenFromRequest(request);</span>
+<span class="fc bfc" id="L193" title="All 2 branches covered.">            if (token != null) {</span>
                 // 从Redis中删除用户会话
-<span class="nc" id="L195">                String sessionKey = &quot;user:session:&quot; + token;</span>
-<span class="nc" id="L196">                redisUtil.delete(sessionKey);</span>
-<span class="nc" id="L197">                log.info(&quot;用户退出登录: {}&quot;, token);</span>
+<span class="fc" id="L195">                String sessionKey = &quot;user:session:&quot; + token;</span>
+<span class="fc" id="L196">                redisUtil.delete(sessionKey);</span>
+<span class="fc" id="L197">                log.info(&quot;用户退出登录: {}&quot;, token);</span>
             }
-<span class="nc" id="L199">            return Result.success(&quot;退出登录成功&quot;);</span>
-<span class="nc" id="L200">        } catch (Exception e) {</span>
-<span class="nc" id="L201">            log.error(&quot;退出登录异常: {}&quot;, e.getMessage(), e);</span>
-<span class="nc" id="L202">            return Result.error(&quot;退出登录失败&quot;);</span>
+<span class="fc" id="L199">            return Result.success(&quot;退出登录成功&quot;);</span>
+<span class="fc" id="L200">        } catch (Exception e) {</span>
+<span class="fc" id="L201">            log.error(&quot;退出登录异常: {}&quot;, e.getMessage(), e);</span>
+<span class="fc" id="L202">            return Result.error(&quot;退出登录失败&quot;);</span>
         }
     }
 
@@ -210,16 +210,16 @@ import java.util.concurrent.TimeUnit;
     @Operation(summary = &quot;检查VIP状态&quot;, description = &quot;检查当前用户的VIP状态&quot;)
     public Result&lt;Boolean&gt; checkVipStatus() {
         try {
-<span class="nc" id="L213">            User currentUser = getCurrentUser();</span>
-<span class="nc bnc" id="L214" title="All 2 branches missed.">            if (currentUser == null) {</span>
-<span class="nc" id="L215">                return Result.unauthorized(&quot;用户未登录&quot;);</span>
+<span class="fc" id="L213">            User currentUser = getCurrentUser();</span>
+<span class="fc bfc" id="L214" title="All 2 branches covered.">            if (currentUser == null) {</span>
+<span class="fc" id="L215">                return Result.unauthorized(&quot;用户未登录&quot;);</span>
             }
 
-<span class="nc" id="L218">            boolean isVip = userService.isVipUser(currentUser.getId());</span>
-<span class="nc" id="L219">            return Result.success(isVip);</span>
-<span class="nc" id="L220">        } catch (Exception e) {</span>
-<span class="nc" id="L221">            log.error(&quot;检查VIP状态异常: {}&quot;, e.getMessage(), e);</span>
-<span class="nc" id="L222">            return Result.error(&quot;检查VIP状态失败&quot;);</span>
+<span class="fc" id="L218">            boolean isVip = userService.isVipUser(currentUser.getId());</span>
+<span class="fc" id="L219">            return Result.success(isVip);</span>
+<span class="fc" id="L220">        } catch (Exception e) {</span>
+<span class="fc" id="L221">            log.error(&quot;检查VIP状态异常: {}&quot;, e.getMessage(), e);</span>
+<span class="fc" id="L222">            return Result.error(&quot;检查VIP状态失败&quot;);</span>
         }
     }
 
@@ -229,20 +229,20 @@ import java.util.concurrent.TimeUnit;
     private User getCurrentUser() {
         try {
             // 从SecurityContext中获取用户信息
-<span class="nc" id="L232">            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();</span>
-<span class="nc bnc" id="L233" title="All 4 branches missed.">            if (authentication == null || authentication.getPrincipal() == null) {</span>
-<span class="nc" id="L234">                return null;</span>
+<span class="fc" id="L232">            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();</span>
+<span class="fc bfc" id="L233" title="All 4 branches covered.">            if (authentication == null || authentication.getPrincipal() == null) {</span>
+<span class="fc" id="L234">                return null;</span>
             }
 
             // 检查principal是否为User对象
-<span class="nc bnc" id="L238" title="All 2 branches missed.">            if (authentication.getPrincipal() instanceof User) {</span>
-<span class="nc" id="L239">                return (User) authentication.getPrincipal();</span>
+<span class="fc bfc" id="L238" title="All 2 branches covered.">            if (authentication.getPrincipal() instanceof User) {</span>
+<span class="fc" id="L239">                return (User) authentication.getPrincipal();</span>
             }
             
-<span class="nc" id="L242">            return null;</span>
-<span class="nc" id="L243">        } catch (Exception e) {</span>
-<span class="nc" id="L244">            log.error(&quot;获取当前用户失败: {}&quot;, e.getMessage(), e);</span>
-<span class="nc" id="L245">            return null;</span>
+<span class="fc" id="L242">            return null;</span>
+<span class="fc" id="L243">        } catch (Exception e) {</span>
+<span class="fc" id="L244">            log.error(&quot;获取当前用户失败: {}&quot;, e.getMessage(), e);</span>
+<span class="fc" id="L245">            return null;</span>
         }
     }
 
@@ -250,11 +250,11 @@ import java.util.concurrent.TimeUnit;
      * 从请求中获取Token
      */
     private String getTokenFromRequest(HttpServletRequest request) {
-<span class="nc" id="L253">        String token = request.getHeader(&quot;Authorization&quot;);</span>
-<span class="nc bnc" id="L254" title="All 4 branches missed.">        if (token != null &amp;&amp; token.startsWith(&quot;Bearer &quot;)) {</span>
-<span class="nc" id="L255">            return token.substring(7);</span>
+<span class="fc" id="L253">        String token = request.getHeader(&quot;Authorization&quot;);</span>
+<span class="fc bfc" id="L254" title="All 4 branches covered.">        if (token != null &amp;&amp; token.startsWith(&quot;Bearer &quot;)) {</span>
+<span class="fc" id="L255">            return token.substring(7);</span>
         }
-<span class="nc" id="L257">        return null;</span>
+<span class="fc" id="L257">        return null;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

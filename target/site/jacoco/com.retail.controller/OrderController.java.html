@@ -19,11 +19,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 /**
  * 订单控制器
  */
-<span class="nc" id="L22">@Slf4j</span>
+<span class="fc" id="L22">@Slf4j</span>
 @RestController
 @RequestMapping(&quot;/orders&quot;)
 @Tag(name = &quot;订单管理&quot;, description = &quot;订单创建、查询、管理相关接口&quot;)
-<span class="nc" id="L26">public class OrderController {</span>
+<span class="fc" id="L26">public class OrderController {</span>
 
     @Autowired
     private OrderService orderService;
@@ -37,17 +37,17 @@ import org.springframework.security.core.context.SecurityContextHolder;
                                     HttpServletRequest request) {
         try {
             // 调试：打印接收到的订单数据
-<span class="nc" id="L40">            log.info(&quot;接收到的订单数据: {}&quot;, order);</span>
+<span class="fc" id="L40">            log.info(&quot;接收到的订单数据: {}&quot;, order);</span>
             
             // 从请求中获取用户ID（实际项目中应该从JWT token中获取）
-<span class="nc" id="L43">            Long userId = getUserIdFromRequest(request);</span>
-<span class="nc bnc" id="L44" title="All 2 branches missed.">            if (userId == null) {</span>
-<span class="nc" id="L45">                return Result.unauthorized(&quot;用户未登录&quot;);</span>
+<span class="fc" id="L43">            Long userId = getUserIdFromRequest(request);</span>
+<span class="fc bfc" id="L44" title="All 2 branches covered.">            if (userId == null) {</span>
+<span class="fc" id="L45">                return Result.unauthorized(&quot;用户未登录&quot;);</span>
             }
-<span class="nc" id="L47">            order.setUserId(userId);</span>
+<span class="fc" id="L47">            order.setUserId(userId);</span>
 
-<span class="nc" id="L49">            Order createdOrder = orderService.createOrder(order);</span>
-<span class="nc" id="L50">            return Result.success(createdOrder);</span>
+<span class="fc" id="L49">            Order createdOrder = orderService.createOrder(order);</span>
+<span class="fc" id="L50">            return Result.success(createdOrder);</span>
 <span class="nc" id="L51">        } catch (Exception e) {</span>
 <span class="nc" id="L52">            log.error(&quot;创建订单失败: {}&quot;, e.getMessage(), e);</span>
 <span class="nc" id="L53">            return Result.error(&quot;创建订单失败: &quot; + e.getMessage());</span>
@@ -61,13 +61,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
     @Operation(summary = &quot;获取用户订单列表&quot;, description = &quot;获取当前用户的订单列表&quot;)
     public Result&lt;List&lt;Order&gt;&gt; getUserOrders(HttpServletRequest request) {
         try {
-<span class="nc" id="L64">            Long userId = getUserIdFromRequest(request);</span>
-<span class="nc bnc" id="L65" title="All 2 branches missed.">            if (userId == null) {</span>
+<span class="fc" id="L64">            Long userId = getUserIdFromRequest(request);</span>
+<span class="pc bpc" id="L65" title="1 of 2 branches missed.">            if (userId == null) {</span>
 <span class="nc" id="L66">                return Result.unauthorized(&quot;用户未登录&quot;);</span>
             }
 
-<span class="nc" id="L69">            List&lt;Order&gt; orders = orderService.getOrdersByUserId(userId);</span>
-<span class="nc" id="L70">            return Result.success(orders);</span>
+<span class="fc" id="L69">            List&lt;Order&gt; orders = orderService.getOrdersByUserId(userId);</span>
+<span class="fc" id="L70">            return Result.success(orders);</span>
 <span class="nc" id="L71">        } catch (Exception e) {</span>
 <span class="nc" id="L72">            log.error(&quot;获取订单列表失败: {}&quot;, e.getMessage(), e);</span>
 <span class="nc" id="L73">            return Result.error(&quot;获取订单列表失败&quot;);</span>
@@ -83,14 +83,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
             @Parameter(description = &quot;订单ID&quot;, required = true) @PathVariable Long id,
             HttpServletRequest request) {
         try {
-<span class="nc" id="L86">            Long userId = getUserIdFromRequest(request);</span>
-<span class="nc bnc" id="L87" title="All 2 branches missed.">            if (userId == null) {</span>
-<span class="nc" id="L88">                return Result.unauthorized(&quot;用户未登录&quot;);</span>
+<span class="fc" id="L86">            Long userId = getUserIdFromRequest(request);</span>
+<span class="fc bfc" id="L87" title="All 2 branches covered.">            if (userId == null) {</span>
+<span class="fc" id="L88">                return Result.unauthorized(&quot;用户未登录&quot;);</span>
             }
 
-<span class="nc" id="L91">            Order order = orderService.getOrderById(id);</span>
-<span class="nc bnc" id="L92" title="All 2 branches missed.">            if (order != null) {</span>
-<span class="nc" id="L93">                return Result.success(order);</span>
+<span class="fc" id="L91">            Order order = orderService.getOrderById(id);</span>
+<span class="pc bpc" id="L92" title="1 of 2 branches missed.">            if (order != null) {</span>
+<span class="fc" id="L93">                return Result.success(order);</span>
             } else {
 <span class="nc" id="L95">                return Result.error(&quot;订单不存在&quot;);</span>
             }
@@ -109,14 +109,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
             @Parameter(description = &quot;订单ID&quot;, required = true) @PathVariable Long id,
             HttpServletRequest request) {
         try {
-<span class="nc" id="L112">            Long userId = getUserIdFromRequest(request);</span>
-<span class="nc bnc" id="L113" title="All 2 branches missed.">            if (userId == null) {</span>
+<span class="fc" id="L112">            Long userId = getUserIdFromRequest(request);</span>
+<span class="pc bpc" id="L113" title="1 of 2 branches missed.">            if (userId == null) {</span>
 <span class="nc" id="L114">                return Result.unauthorized(&quot;用户未登录&quot;);</span>
             }
 
-<span class="nc" id="L117">            boolean success = orderService.cancelOrder(id);</span>
-<span class="nc bnc" id="L118" title="All 2 branches missed.">            if (success) {</span>
-<span class="nc" id="L119">                return Result.success(&quot;订单已取消&quot;);</span>
+<span class="fc" id="L117">            boolean success = orderService.cancelOrder(id);</span>
+<span class="pc bpc" id="L118" title="1 of 2 branches missed.">            if (success) {</span>
+<span class="fc" id="L119">                return Result.success(&quot;订单已取消&quot;);</span>
             } else {
 <span class="nc" id="L121">                return Result.error(&quot;取消订单失败&quot;);</span>
             }
@@ -135,15 +135,15 @@ import org.springframework.security.core.context.SecurityContextHolder;
             @Parameter(description = &quot;订单ID&quot;, required = true) @PathVariable Long id,
             HttpServletRequest request) {
         try {
-<span class="nc" id="L138">            Long userId = getUserIdFromRequest(request);</span>
-<span class="nc bnc" id="L139" title="All 2 branches missed.">            if (userId == null) {</span>
+<span class="fc" id="L138">            Long userId = getUserIdFromRequest(request);</span>
+<span class="pc bpc" id="L139" title="1 of 2 branches missed.">            if (userId == null) {</span>
 <span class="nc" id="L140">                return Result.unauthorized(&quot;用户未登录&quot;);</span>
             }
 
             // 调用updateOrderStatus方法将订单状态更新为&quot;已完成&quot;（假设状态码3表示已完成）
-<span class="nc" id="L144">            boolean success = orderService.updateOrderStatus(id, 3);</span>
-<span class="nc bnc" id="L145" title="All 2 branches missed.">            if (success) {</span>
-<span class="nc" id="L146">                return Result.success(&quot;确认收货成功&quot;);</span>
+<span class="fc" id="L144">            boolean success = orderService.updateOrderStatus(id, 3);</span>
+<span class="pc bpc" id="L145" title="1 of 2 branches missed.">            if (success) {</span>
+<span class="fc" id="L146">                return Result.success(&quot;确认收货成功&quot;);</span>
             } else {
 <span class="nc" id="L148">                return Result.error(&quot;确认收货失败&quot;);</span>
             }
@@ -160,14 +160,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
     @Operation(summary = &quot;获取订单统计&quot;, description = &quot;获取用户订单统计信息&quot;)
     public Result&lt;Map&lt;String, Object&gt;&gt; getOrderStatistics(HttpServletRequest request) {
         try {
-<span class="nc" id="L163">            Long userId = getUserIdFromRequest(request);</span>
-<span class="nc bnc" id="L164" title="All 2 branches missed.">            if (userId == null) {</span>
+<span class="fc" id="L163">            Long userId = getUserIdFromRequest(request);</span>
+<span class="pc bpc" id="L164" title="1 of 2 branches missed.">            if (userId == null) {</span>
 <span class="nc" id="L165">                return Result.unauthorized(&quot;用户未登录&quot;);</span>
             }
 
             // 暂时返回空的统计信息，实际功能需要在OrderService中实现
-<span class="nc" id="L169">            Map&lt;String, Object&gt; statistics = new java.util.HashMap&lt;&gt;();</span>
-<span class="nc" id="L170">            return Result.success(statistics);</span>
+<span class="fc" id="L169">            Map&lt;String, Object&gt; statistics = new java.util.HashMap&lt;&gt;();</span>
+<span class="fc" id="L170">            return Result.success(statistics);</span>
 <span class="nc" id="L171">        } catch (Exception e) {</span>
 <span class="nc" id="L172">            log.error(&quot;获取订单统计失败: {}&quot;, e.getMessage(), e);</span>
 <span class="nc" id="L173">            return Result.error(&quot;获取订单统计失败&quot;);</span>
@@ -179,14 +179,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
      */
     private Long getUserIdFromRequest(HttpServletRequest request) {
         try {
-<span class="nc" id="L182">            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();</span>
-<span class="nc bnc" id="L183" title="All 4 branches missed.">            if (authentication != null &amp;&amp; authentication.getPrincipal() != null) {</span>
-<span class="nc" id="L184">                Object principal = authentication.getPrincipal();</span>
+<span class="fc" id="L182">            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();</span>
+<span class="pc bpc" id="L183" title="1 of 4 branches missed.">            if (authentication != null &amp;&amp; authentication.getPrincipal() != null) {</span>
+<span class="fc" id="L184">                Object principal = authentication.getPrincipal();</span>
                 
                 // 处理User实体对象情况
-<span class="nc bnc" id="L187" title="All 2 branches missed.">                if (principal instanceof com.retail.entity.User) {</span>
-<span class="nc" id="L188">                    com.retail.entity.User user = (com.retail.entity.User) principal;</span>
-<span class="nc" id="L189">                    return user.getId();</span>
+<span class="pc bpc" id="L187" title="1 of 2 branches missed.">                if (principal instanceof com.retail.entity.User) {</span>
+<span class="fc" id="L188">                    com.retail.entity.User user = (com.retail.entity.User) principal;</span>
+<span class="fc" id="L189">                    return user.getId();</span>
                 }
                 
                 // 保留对Map类型的支持（兼容旧版本）
@@ -200,8 +200,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
             }
 <span class="nc" id="L201">        } catch (Exception e) {</span>
 <span class="nc" id="L202">            log.error(&quot;获取用户ID失败: {}&quot;, e.getMessage());</span>
-<span class="nc" id="L203">        }</span>
-<span class="nc" id="L204">        return null;</span>
+<span class="fc" id="L203">        }</span>
+<span class="fc" id="L204">        return null;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
  * 订单实体类
  * 【重构说明】使用统一的 OrderStatusEnum 替代硬编码状态码
  */
-<span class="pc" id="L16">@Data</span>
+<span class="fc" id="L16">@Data</span>
 <span class="nc bnc" id="L17" title="All 158 branches missed.">@EqualsAndHashCode(callSuper = false)</span>
 @TableName(&quot;order_info&quot;)
 public class Order implements Serializable {
@@ -146,15 +146,15 @@ public class Order implements Serializable {
      * 获取支付方式名称
      */
     public String getPayMethodName() {
-<span class="pc bpc" id="L149" title="3 of 4 branches missed.">        switch (this.payMethod) {</span>
+<span class="fc bfc" id="L149" title="All 4 branches covered.">        switch (this.payMethod) {</span>
             case 1:
 <span class="fc" id="L151">                return &quot;支付宝&quot;;</span>
             case 2:
-<span class="nc" id="L153">                return &quot;微信&quot;;</span>
+<span class="fc" id="L153">                return &quot;微信&quot;;</span>
             case 3:
-<span class="nc" id="L155">                return &quot;银行卡&quot;;</span>
+<span class="fc" id="L155">                return &quot;银行卡&quot;;</span>
             default:
-<span class="nc" id="L157">                return &quot;未知&quot;;</span>
+<span class="fc" id="L157">                return &quot;未知&quot;;</span>
         }
     }
 }

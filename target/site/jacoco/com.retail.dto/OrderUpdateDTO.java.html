@@ -8,16 +8,16 @@ import javax.validation.constraints.NotNull;
 /**
  * 订单更新DTO
  */
-<span class="nc bnc" id="L11" title="All 62 branches missed.">@Data</span>
+<span class="pc bnc" id="L11" title="All 62 branches missed.">@Data</span>
 @Schema(description = &quot;订单更新请求&quot;)
 public class OrderUpdateDTO {
 
     @NotNull(message = &quot;订单ID不能为空&quot;)
     @Schema(description = &quot;订单ID&quot;)
-<span class="nc" id="L17">    private Long id;</span>
+<span class="fc" id="L17">    private Long id;</span>
 
     @Schema(description = &quot;订单状态&quot;, allowableValues = {&quot;PENDING&quot;, &quot;PAID&quot;, &quot;SHIPPED&quot;, &quot;DELIVERED&quot;, &quot;CANCELLED&quot;})
-<span class="nc" id="L20">    private String status;</span>
+<span class="fc" id="L20">    private String status;</span>
 
     @Schema(description = &quot;支付状态&quot;, allowableValues = {&quot;UNPAID&quot;, &quot;PAID&quot;, &quot;REFUNDED&quot;})
 <span class="nc" id="L23">    private String paymentStatus;</span>
@@ -32,6 +32,6 @@ public class OrderUpdateDTO {
 <span class="nc" id="L32">    private String remarks;</span>
 
     @Schema(description = &quot;快递单号&quot;)
-<span class="nc" id="L35">    private String trackingNumber;</span>
+<span class="fc" id="L35">    private String trackingNumber;</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

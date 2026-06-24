@@ -8,22 +8,22 @@ import javax.validation.constraints.NotBlank;
 /**
  * 管理员登录请求DTO
  */
-<span class="nc bnc" id="L11" title="All 38 branches missed.">@Data</span>
+<span class="pc bnc" id="L11" title="All 38 branches missed.">@Data</span>
 @Schema(description = &quot;管理员登录请求&quot;)
 public class AdminLoginDTO {
 
     @NotBlank(message = &quot;用户名不能为空&quot;)
     @Schema(description = &quot;用户名&quot;, example = &quot;admin&quot;)
-<span class="nc" id="L17">    private String username;</span>
+<span class="fc" id="L17">    private String username;</span>
 
     @NotBlank(message = &quot;密码不能为空&quot;)
     @Schema(description = &quot;密码&quot;, example = &quot;123456&quot;)
-<span class="nc" id="L21">    private String password;</span>
+<span class="fc" id="L21">    private String password;</span>
 
     @Schema(description = &quot;验证码&quot;, example = &quot;1234&quot;)
-<span class="nc" id="L24">    private String captcha;</span>
+<span class="fc" id="L24">    private String captcha;</span>
 
-<span class="nc" id="L26">    @Schema(description = &quot;记住我&quot;, example = &quot;false&quot;)</span>
-<span class="nc" id="L27">    private Boolean rememberMe = false;</span>
+<span class="fc" id="L26">    @Schema(description = &quot;记住我&quot;, example = &quot;false&quot;)</span>
+<span class="fc" id="L27">    private Boolean rememberMe = false;</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

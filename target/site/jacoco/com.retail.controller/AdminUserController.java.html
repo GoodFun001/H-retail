@@ -21,8 +21,8 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping(&quot;/admin/user&quot;)
-<span class="nc" id="L24">@RequiredArgsConstructor</span>
-<span class="nc" id="L25">@Slf4j</span>
+<span class="fc" id="L24">@RequiredArgsConstructor</span>
+<span class="fc" id="L25">@Slf4j</span>
 @Tag(name = &quot;管理员用户管理&quot;, description = &quot;管理员对用户进行管理的相关接口&quot;)
 public class AdminUserController {
 
@@ -38,12 +38,12 @@ public class AdminUserController {
             @RequestParam(defaultValue = &quot;10&quot;) Integer pageSize,
             @RequestParam(required = false) String searchKey) {
         try {
-<span class="nc" id="L41">            Page&lt;User&gt; page = new Page&lt;&gt;(pageNum, pageSize);</span>
-<span class="nc" id="L42">            IPage&lt;User&gt; userList = userService.page(page);</span>
-<span class="nc" id="L43">            return Result.success(userList);</span>
-<span class="nc" id="L44">        } catch (Exception e) {</span>
-<span class="nc" id="L45">            log.error(&quot;获取用户列表失败: {}&quot;, e.getMessage(), e);</span>
-<span class="nc" id="L46">            return Result.error(&quot;获取用户列表失败&quot;);</span>
+<span class="fc" id="L41">            Page&lt;User&gt; page = new Page&lt;&gt;(pageNum, pageSize);</span>
+<span class="fc" id="L42">            IPage&lt;User&gt; userList = userService.page(page);</span>
+<span class="fc" id="L43">            return Result.success(userList);</span>
+<span class="fc" id="L44">        } catch (Exception e) {</span>
+<span class="fc" id="L45">            log.error(&quot;获取用户列表失败: {}&quot;, e.getMessage(), e);</span>
+<span class="fc" id="L46">            return Result.error(&quot;获取用户列表失败&quot;);</span>
         }
     }
 
@@ -55,17 +55,17 @@ public class AdminUserController {
     public Result&lt;User&gt; getUserDetail(
             @Parameter(description = &quot;用户ID&quot;, required = true) @PathVariable Long id) {
         try {
-<span class="nc" id="L58">            User user = userService.getById(id);</span>
-<span class="nc bnc" id="L59" title="All 2 branches missed.">            if (user != null) {</span>
+<span class="fc" id="L58">            User user = userService.getById(id);</span>
+<span class="fc bfc" id="L59" title="All 2 branches covered.">            if (user != null) {</span>
                 // 清除敏感信息
-<span class="nc" id="L61">                user.setPassword(null);</span>
-<span class="nc" id="L62">                return Result.success(user);</span>
+<span class="fc" id="L61">                user.setPassword(null);</span>
+<span class="fc" id="L62">                return Result.success(user);</span>
             } else {
-<span class="nc" id="L64">                return Result.error(&quot;用户不存在&quot;);</span>
+<span class="fc" id="L64">                return Result.error(&quot;用户不存在&quot;);</span>
             }
-<span class="nc" id="L66">        } catch (Exception e) {</span>
-<span class="nc" id="L67">            log.error(&quot;获取用户详情失败: {}&quot;, e.getMessage(), e);</span>
-<span class="nc" id="L68">            return Result.error(&quot;获取用户详情失败&quot;);</span>
+<span class="fc" id="L66">        } catch (Exception e) {</span>
+<span class="fc" id="L67">            log.error(&quot;获取用户详情失败: {}&quot;, e.getMessage(), e);</span>
+<span class="fc" id="L68">            return Result.error(&quot;获取用户详情失败&quot;);</span>
         }
     }
 
@@ -79,16 +79,16 @@ public class AdminUserController {
             @Valid @RequestBody User user) {
         try {
             // 设置用户ID，防止修改其他用户信息
-<span class="nc" id="L82">            user.setId(id);</span>
-<span class="nc" id="L83">            boolean success = userService.updateUserInfo(user);</span>
-<span class="nc bnc" id="L84" title="All 2 branches missed.">            if (success) {</span>
-<span class="nc" id="L85">                return Result.success(&quot;更新用户信息成功&quot;);</span>
+<span class="fc" id="L82">            user.setId(id);</span>
+<span class="fc" id="L83">            boolean success = userService.updateUserInfo(user);</span>
+<span class="fc bfc" id="L84" title="All 2 branches covered.">            if (success) {</span>
+<span class="fc" id="L85">                return Result.success(&quot;更新用户信息成功&quot;);</span>
             } else {
-<span class="nc" id="L87">                return Result.error(&quot;更新用户信息失败&quot;);</span>
+<span class="fc" id="L87">                return Result.error(&quot;更新用户信息失败&quot;);</span>
             }
-<span class="nc" id="L89">        } catch (Exception e) {</span>
-<span class="nc" id="L90">            log.error(&quot;更新用户信息失败: {}&quot;, e.getMessage(), e);</span>
-<span class="nc" id="L91">            return Result.error(&quot;更新用户信息失败&quot;);</span>
+<span class="fc" id="L89">        } catch (Exception e) {</span>
+<span class="fc" id="L90">            log.error(&quot;更新用户信息失败: {}&quot;, e.getMessage(), e);</span>
+<span class="fc" id="L91">            return Result.error(&quot;更新用户信息失败&quot;);</span>
         }
     }
 
@@ -100,15 +100,15 @@ public class AdminUserController {
     public Result&lt;String&gt; deleteUser(
             @Parameter(description = &quot;用户ID&quot;, required = true) @PathVariable Long id) {
         try {
-<span class="nc" id="L103">            boolean success = userService.removeById(id);</span>
-<span class="nc bnc" id="L104" title="All 2 branches missed.">            if (success) {</span>
-<span class="nc" id="L105">                return Result.success(&quot;删除用户成功&quot;);</span>
+<span class="fc" id="L103">            boolean success = userService.removeById(id);</span>
+<span class="fc bfc" id="L104" title="All 2 branches covered.">            if (success) {</span>
+<span class="fc" id="L105">                return Result.success(&quot;删除用户成功&quot;);</span>
             } else {
-<span class="nc" id="L107">                return Result.error(&quot;删除用户失败&quot;);</span>
+<span class="fc" id="L107">                return Result.error(&quot;删除用户失败&quot;);</span>
             }
-<span class="nc" id="L109">        } catch (Exception e) {</span>
-<span class="nc" id="L110">            log.error(&quot;删除用户失败: {}&quot;, e.getMessage(), e);</span>
-<span class="nc" id="L111">            return Result.error(&quot;删除用户失败&quot;);</span>
+<span class="fc" id="L109">        } catch (Exception e) {</span>
+<span class="fc" id="L110">            log.error(&quot;删除用户失败: {}&quot;, e.getMessage(), e);</span>
+<span class="fc" id="L111">            return Result.error(&quot;删除用户失败&quot;);</span>
         }
     }
 
@@ -121,18 +121,18 @@ public class AdminUserController {
             @Parameter(description = &quot;用户ID&quot;, required = true) @PathVariable Long id,
             @RequestParam Integer status) {
         try {
-<span class="nc" id="L124">            User user = new User();</span>
-<span class="nc" id="L125">            user.setId(id);</span>
-<span class="nc" id="L126">            user.setStatus(status);</span>
-<span class="nc" id="L127">            boolean success = userService.updateById(user);</span>
-<span class="nc bnc" id="L128" title="All 2 branches missed.">            if (success) {</span>
-<span class="nc" id="L129">                return Result.success(&quot;更新用户状态成功&quot;);</span>
+<span class="fc" id="L124">            User user = new User();</span>
+<span class="fc" id="L125">            user.setId(id);</span>
+<span class="fc" id="L126">            user.setStatus(status);</span>
+<span class="fc" id="L127">            boolean success = userService.updateById(user);</span>
+<span class="fc bfc" id="L128" title="All 2 branches covered.">            if (success) {</span>
+<span class="fc" id="L129">                return Result.success(&quot;更新用户状态成功&quot;);</span>
             } else {
-<span class="nc" id="L131">                return Result.error(&quot;更新用户状态失败&quot;);</span>
+<span class="fc" id="L131">                return Result.error(&quot;更新用户状态失败&quot;);</span>
             }
-<span class="nc" id="L133">        } catch (Exception e) {</span>
-<span class="nc" id="L134">            log.error(&quot;更新用户状态失败: {}&quot;, e.getMessage(), e);</span>
-<span class="nc" id="L135">            return Result.error(&quot;更新用户状态失败&quot;);</span>
+<span class="fc" id="L133">        } catch (Exception e) {</span>
+<span class="fc" id="L134">            log.error(&quot;更新用户状态失败: {}&quot;, e.getMessage(), e);</span>
+<span class="fc" id="L135">            return Result.error(&quot;更新用户状态失败&quot;);</span>
         }
     }
 
@@ -143,18 +143,18 @@ public class AdminUserController {
     @Operation(summary = &quot;批量更新用户状态&quot;, description = &quot;管理员批量更新用户状态&quot;)
     public Result&lt;String&gt; batchUpdateUserStatus(@RequestBody List&lt;Map&lt;String, Object&gt;&gt; userStatusList) {
         try {
-<span class="nc bnc" id="L146" title="All 2 branches missed.">            for (Map&lt;String, Object&gt; userStatus : userStatusList) {</span>
-<span class="nc" id="L147">                Long id = Long.valueOf(userStatus.get(&quot;id&quot;).toString());</span>
-<span class="nc" id="L148">                Integer status = Integer.valueOf(userStatus.get(&quot;status&quot;).toString());</span>
-<span class="nc" id="L149">                User user = new User();</span>
-<span class="nc" id="L150">                user.setId(id);</span>
-<span class="nc" id="L151">                user.setStatus(status);</span>
-<span class="nc" id="L152">                userService.updateById(user);</span>
-<span class="nc" id="L153">            }</span>
-<span class="nc" id="L154">            return Result.success(&quot;批量更新用户状态成功&quot;);</span>
-<span class="nc" id="L155">        } catch (Exception e) {</span>
-<span class="nc" id="L156">            log.error(&quot;批量更新用户状态失败: {}&quot;, e.getMessage(), e);</span>
-<span class="nc" id="L157">            return Result.error(&quot;批量更新用户状态失败&quot;);</span>
+<span class="fc bfc" id="L146" title="All 2 branches covered.">            for (Map&lt;String, Object&gt; userStatus : userStatusList) {</span>
+<span class="fc" id="L147">                Long id = Long.valueOf(userStatus.get(&quot;id&quot;).toString());</span>
+<span class="fc" id="L148">                Integer status = Integer.valueOf(userStatus.get(&quot;status&quot;).toString());</span>
+<span class="fc" id="L149">                User user = new User();</span>
+<span class="fc" id="L150">                user.setId(id);</span>
+<span class="fc" id="L151">                user.setStatus(status);</span>
+<span class="fc" id="L152">                userService.updateById(user);</span>
+<span class="fc" id="L153">            }</span>
+<span class="fc" id="L154">            return Result.success(&quot;批量更新用户状态成功&quot;);</span>
+<span class="fc" id="L155">        } catch (Exception e) {</span>
+<span class="fc" id="L156">            log.error(&quot;批量更新用户状态失败: {}&quot;, e.getMessage(), e);</span>
+<span class="fc" id="L157">            return Result.error(&quot;批量更新用户状态失败&quot;);</span>
         }
     }
     
@@ -167,18 +167,18 @@ public class AdminUserController {
             @Parameter(description = &quot;用户ID&quot;, required = true) @PathVariable Long id,
             @RequestParam Integer userType) {
         try {
-<span class="nc" id="L170">            User user = new User();</span>
-<span class="nc" id="L171">            user.setId(id);</span>
-<span class="nc" id="L172">            user.setUserType(userType);</span>
-<span class="nc" id="L173">            boolean success = userService.updateById(user);</span>
-<span class="nc bnc" id="L174" title="All 2 branches missed.">            if (success) {</span>
-<span class="nc" id="L175">                return Result.success(&quot;更新用户VIP状态成功&quot;);</span>
+<span class="fc" id="L170">            User user = new User();</span>
+<span class="fc" id="L171">            user.setId(id);</span>
+<span class="fc" id="L172">            user.setUserType(userType);</span>
+<span class="fc" id="L173">            boolean success = userService.updateById(user);</span>
+<span class="fc bfc" id="L174" title="All 2 branches covered.">            if (success) {</span>
+<span class="fc" id="L175">                return Result.success(&quot;更新用户VIP状态成功&quot;);</span>
             } else {
-<span class="nc" id="L177">                return Result.error(&quot;更新用户VIP状态失败&quot;);</span>
+<span class="fc" id="L177">                return Result.error(&quot;更新用户VIP状态失败&quot;);</span>
             }
-<span class="nc" id="L179">        } catch (Exception e) {</span>
-<span class="nc" id="L180">            log.error(&quot;更新用户VIP状态失败: {}&quot;, e.getMessage(), e);</span>
-<span class="nc" id="L181">            return Result.error(&quot;更新用户VIP状态失败&quot;);</span>
+<span class="fc" id="L179">        } catch (Exception e) {</span>
+<span class="fc" id="L180">            log.error(&quot;更新用户VIP状态失败: {}&quot;, e.getMessage(), e);</span>
+<span class="fc" id="L181">            return Result.error(&quot;更新用户VIP状态失败&quot;);</span>
         }
     }
 }

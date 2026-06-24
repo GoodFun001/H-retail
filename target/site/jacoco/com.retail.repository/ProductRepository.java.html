@@ -17,7 +17,7 @@ import java.util.List;
  */
 <span class="fc" id="L18">@Slf4j</span>
 @Repository
-<span class="nc" id="L20">@RequiredArgsConstructor</span>
+<span class="fc" id="L20">@RequiredArgsConstructor</span>
 public class ProductRepository {
 
     private final ProductMapper productMapper;
@@ -26,14 +26,14 @@ public class ProductRepository {
      * 根据ID查询商品
      */
     public Product findById(Long id) {
-<span class="nc" id="L29">        return productMapper.selectById(id);</span>
+<span class="fc" id="L29">        return productMapper.selectById(id);</span>
     }
 
     /**
      * 根据ID查询商品（别名，兼容旧代码）
      */
     public Product selectById(Long id) {
-<span class="nc" id="L36">        return findById(id);</span>
+<span class="fc" id="L36">        return findById(id);</span>
     }
 
     /**
@@ -61,56 +61,56 @@ public class ProductRepository {
      * 保存商品
      */
     public boolean save(Product product) {
-<span class="nc bnc" id="L64" title="All 2 branches missed.">        return productMapper.insert(product) &gt; 0;</span>
+<span class="pc bpc" id="L64" title="1 of 2 branches missed.">        return productMapper.insert(product) &gt; 0;</span>
     }
 
     /**
      * 保存商品（别名，兼容旧代码）
      */
     public int insert(Product product) {
-<span class="nc" id="L71">        return productMapper.insert(product);</span>
+<span class="fc" id="L71">        return productMapper.insert(product);</span>
     }
 
     /**
      * 更新商品
      */
     public boolean update(Product product) {
-<span class="nc bnc" id="L78" title="All 2 branches missed.">        return productMapper.updateById(product) &gt; 0;</span>
+<span class="pc bpc" id="L78" title="1 of 2 branches missed.">        return productMapper.updateById(product) &gt; 0;</span>
     }
 
     /**
      * 更新商品（别名，兼容旧代码）
      */
     public int updateById(Product product) {
-<span class="nc" id="L85">        return productMapper.updateById(product);</span>
+<span class="fc" id="L85">        return productMapper.updateById(product);</span>
     }
 
     /**
      * 根据ID删除商品（逻辑删除）
      */
     public boolean deleteById(Long id) {
-<span class="nc bnc" id="L92" title="All 2 branches missed.">        return productMapper.deleteById(id) &gt; 0;</span>
+<span class="pc bpc" id="L92" title="1 of 2 branches missed.">        return productMapper.deleteById(id) &gt; 0;</span>
     }
 
     /**
      * 查询所有商品
      */
     public List&lt;Product&gt; findAll() {
-<span class="nc" id="L99">        return productMapper.selectList(null);</span>
+<span class="fc" id="L99">        return productMapper.selectList(null);</span>
     }
 
     /**
      * 统计商品数量
      */
     public Long count() {
-<span class="nc" id="L106">        return productMapper.selectCount(null);</span>
+<span class="fc" id="L106">        return productMapper.selectCount(null);</span>
     }
 
     /**
      * 条件统计商品数量
      */
     public Long count(LambdaQueryWrapper&lt;Product&gt; wrapper) {
-<span class="nc" id="L113">        return productMapper.selectCount(wrapper);</span>
+<span class="fc" id="L113">        return productMapper.selectCount(wrapper);</span>
     }
 
     /**
@@ -124,10 +124,10 @@ public class ProductRepository {
      * 批量更新（使用MyBatis Plus Service层能力）
      */
     public boolean updateBatchById(List&lt;Product&gt; products) {
-<span class="nc bnc" id="L127" title="All 2 branches missed.">        for (Product product : products) {</span>
-<span class="nc bnc" id="L128" title="All 2 branches missed.">            if (productMapper.updateById(product) &lt;= 0) return false;</span>
-<span class="nc" id="L129">        }</span>
-<span class="nc" id="L130">        return true;</span>
+<span class="fc bfc" id="L127" title="All 2 branches covered.">        for (Product product : products) {</span>
+<span class="pc bpc" id="L128" title="1 of 2 branches missed.">            if (productMapper.updateById(product) &lt;= 0) return false;</span>
+<span class="fc" id="L129">        }</span>
+<span class="fc" id="L130">        return true;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

@@ -28,8 +28,8 @@ import java.util.UUID;
  */
 @RestController
 @RequestMapping(&quot;/admin/upload&quot;)
-<span class="nc" id="L31">@RequiredArgsConstructor</span>
-<span class="nc" id="L32">@Slf4j</span>
+<span class="fc" id="L31">@RequiredArgsConstructor</span>
+<span class="fc" id="L32">@Slf4j</span>
 @Tag(name = &quot;管理员文件上传&quot;, description = &quot;管理员上传文件的相关接口&quot;)
 public class AdminUploadController {
 
@@ -50,41 +50,41 @@ public class AdminUploadController {
     @Operation(summary = &quot;上传图片文件&quot;, description = &quot;管理员上传商品图片等文件&quot;)
     public Result&lt;String&gt; uploadFile(@RequestParam(&quot;file&quot;) MultipartFile file) {
         try {
-<span class="nc bnc" id="L53" title="All 2 branches missed.">            if (file.isEmpty()) {</span>
-<span class="nc" id="L54">                return Result.paramError(&quot;请选择要上传的文件&quot;);</span>
+<span class="fc bfc" id="L53" title="All 2 branches covered.">            if (file.isEmpty()) {</span>
+<span class="fc" id="L54">                return Result.paramError(&quot;请选择要上传的文件&quot;);</span>
             }
 
             // 检查文件类型
-<span class="nc" id="L58">            String contentType = file.getContentType();</span>
-<span class="nc bnc" id="L59" title="All 4 branches missed.">            if (contentType == null || !contentType.startsWith(&quot;image/&quot;)) {</span>
-<span class="nc" id="L60">                return Result.paramError(&quot;只支持图片文件上传&quot;);</span>
+<span class="fc" id="L58">            String contentType = file.getContentType();</span>
+<span class="fc bfc" id="L59" title="All 4 branches covered.">            if (contentType == null || !contentType.startsWith(&quot;image/&quot;)) {</span>
+<span class="fc" id="L60">                return Result.paramError(&quot;只支持图片文件上传&quot;);</span>
             }
 
             // 检查文件大小（限制5MB）
-<span class="nc" id="L64">            long maxSize = 5 * 1024 * 1024;</span>
-<span class="nc bnc" id="L65" title="All 2 branches missed.">            if (file.getSize() &gt; maxSize) {</span>
-<span class="nc" id="L66">                return Result.paramError(&quot;文件大小不能超过5MB&quot;);</span>
+<span class="fc" id="L64">            long maxSize = 5 * 1024 * 1024;</span>
+<span class="fc bfc" id="L65" title="All 2 branches covered.">            if (file.getSize() &gt; maxSize) {</span>
+<span class="fc" id="L66">                return Result.paramError(&quot;文件大小不能超过5MB&quot;);</span>
             }
 
             // 创建上传目录（按日期）
-<span class="nc" id="L70">            String dateDir = LocalDateTime.now().format(DateTimeFormatter.ofPattern(&quot;yyyy/MM/dd&quot;));</span>
-<span class="nc" id="L71">            Path uploadDir = Paths.get(uploadPath, dateDir);</span>
-<span class="nc" id="L72">            Files.createDirectories(uploadDir);</span>
+<span class="fc" id="L70">            String dateDir = LocalDateTime.now().format(DateTimeFormatter.ofPattern(&quot;yyyy/MM/dd&quot;));</span>
+<span class="fc" id="L71">            Path uploadDir = Paths.get(uploadPath, dateDir);</span>
+<span class="fc" id="L72">            Files.createDirectories(uploadDir);</span>
 
             // 生成唯一文件名
-<span class="nc" id="L75">            String originalFilename = file.getOriginalFilename();</span>
-<span class="nc bnc" id="L76" title="All 2 branches missed.">            String fileExt = originalFilename != null ? originalFilename.substring(originalFilename.lastIndexOf('.')) : &quot;.jpg&quot;;</span>
-<span class="nc" id="L77">            String fileName = UUID.randomUUID().toString() + fileExt;</span>
+<span class="fc" id="L75">            String originalFilename = file.getOriginalFilename();</span>
+<span class="pc bpc" id="L76" title="1 of 2 branches missed.">            String fileExt = originalFilename != null ? originalFilename.substring(originalFilename.lastIndexOf('.')) : &quot;.jpg&quot;;</span>
+<span class="fc" id="L77">            String fileName = UUID.randomUUID().toString() + fileExt;</span>
 
             // 保存文件
-<span class="nc" id="L80">            Path filePath = uploadDir.resolve(fileName);</span>
-<span class="nc" id="L81">            file.transferTo(filePath);</span>
+<span class="fc" id="L80">            Path filePath = uploadDir.resolve(fileName);</span>
+<span class="fc" id="L81">            file.transferTo(filePath);</span>
 
             // 构建可访问的URL (使用相对路径，前端会自动根据当前访问地址补全)
-<span class="nc" id="L84">            String fileUrl = String.format(&quot;/api/uploads/%s/%s&quot;, dateDir, fileName);</span>
+<span class="fc" id="L84">            String fileUrl = String.format(&quot;/api/uploads/%s/%s&quot;, dateDir, fileName);</span>
 
-<span class="nc" id="L86">            log.info(&quot;文件上传成功: {} -&gt; {}&quot;, originalFilename, fileUrl);</span>
-<span class="nc" id="L87">            return Result.success(fileUrl);</span>
+<span class="fc" id="L86">            log.info(&quot;文件上传成功: {} -&gt; {}&quot;, originalFilename, fileUrl);</span>
+<span class="fc" id="L87">            return Result.success(fileUrl);</span>
 <span class="nc" id="L88">        } catch (IOException e) {</span>
 <span class="nc" id="L89">            log.error(&quot;文件上传失败: {}&quot;, e.getMessage(), e);</span>
 <span class="nc" id="L90">            return Result.error(&quot;文件上传失败&quot;);</span>
