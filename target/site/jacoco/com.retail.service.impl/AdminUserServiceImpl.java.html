@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AdminUserServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">retail-platform</a> &gt; <a href="index.source.html" class="el_package">com.retail.service.impl</a> &gt; <span class="el_source">AdminUserServiceImpl.java</span></div><h1>AdminUserServiceImpl.java</h1><pre class="source lang-java linenums">package com.retail.service.impl;
+
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.retail.dto.UserCreateDTO;
+import com.retail.dto.UserDTO;
+import com.retail.dto.UserSearchDTO;
+import com.retail.dto.UserUpdateDTO;
+import com.retail.entity.User;
+import com.retail.repository.AdminUserRepository;
+import com.retail.service.AdminUserService;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+/**
+ * 管理员用户服务实现类
+ * 【重构说明】引入Repository层，Service通过AdminUserRepository访问数据，
+ * 不再直接依赖AdminUserMapper，符合分层架构原则。
+ */
+@Service
+<span class="nc" id="L33">public class AdminUserServiceImpl implements AdminUserService {</span>
+
+    @Autowired
+    private AdminUserRepository adminUserRepository;
+    
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Override
+    public PageInfo&lt;UserDTO&gt; getUserList(UserSearchDTO searchDTO) {
+        // 设置分页
+<span class="nc" id="L44">        PageHelper.startPage(searchDTO.getPageNum(), searchDTO.getPageSize());</span>
+        
+        // 查询数据
+<span class="nc" id="L47">        List&lt;User&gt; users = adminUserRepository.selectUserList(searchDTO);</span>
+        
+        // 转换为DTO
+<span class="nc" id="L50">        List&lt;UserDTO&gt; userDTOs = users.stream()</span>
+<span class="nc" id="L51">                .map(this::convertToDTO)</span>
+<span class="nc" id="L52">                .collect(Collectors.toList());</span>
+        
+<span class="nc" id="L54">        return new PageInfo&lt;&gt;(userDTOs);</span>
+    }
+
+    @Override
+    public UserDTO getUserById(Long id) {
+<span class="nc" id="L59">        User user = adminUserRepository.selectById(id);</span>
+<span class="nc bnc" id="L60" title="All 2 branches missed.">        return user != null ? convertToDTO(user) : null;</span>
+    }
+
+    @Override
+    @Transactional
+    public UserDTO createUser(UserCreateDTO createDTO) {
+        // 检查用户名是否存在
+<span class="nc bnc" id="L67" title="All 2 branches missed.">        if (existsByUsername(createDTO.getUsername())) {</span>
+<span class="nc" id="L68">            throw new RuntimeException(&quot;用户名已存在&quot;);</span>
+        }
+        
+        // 检查邮箱是否存在
+<span class="nc bnc" id="L72" title="All 2 branches missed.">        if (existsByEmail(createDTO.getEmail())) {</span>
+<span class="nc" id="L73">            throw new RuntimeException(&quot;邮箱已存在&quot;);</span>
+        }
+        
+        // 创建用户
+<span class="nc" id="L77">        User user = new User();</span>
+<span class="nc" id="L78">        BeanUtils.copyProperties(createDTO, user);</span>
+<span class="nc" id="L79">        user.setPassword(passwordEncoder.encode(createDTO.getPassword()));</span>
+<span class="nc bnc" id="L80" title="All 2 branches missed.">        user.setStatus(createDTO.getStatus() != null ? createDTO.getStatus() : 1);</span>
+        
+<span class="nc" id="L82">        adminUserRepository.insert(user);</span>
+        
+<span class="nc" id="L84">        return convertToDTO(user);</span>
+    }
+
+    @Override
+    @Transactional
+    public UserDTO updateUser(Long id, UserUpdateDTO updateDTO) {
+<span class="nc" id="L90">        User user = adminUserRepository.selectById(id);</span>
+<span class="nc bnc" id="L91" title="All 2 branches missed.">        if (user == null) {</span>
+<span class="nc" id="L92">            throw new RuntimeException(&quot;用户不存在&quot;);</span>
+        }
+        
+        // 如果更新用户名，检查是否存在
+<span class="nc bnc" id="L96" title="All 2 branches missed.">        if (updateDTO.getUsername() != null &amp;&amp; </span>
+<span class="nc bnc" id="L97" title="All 2 branches missed.">            !updateDTO.getUsername().equals(user.getUsername()) &amp;&amp;</span>
+<span class="nc bnc" id="L98" title="All 2 branches missed.">            existsByUsername(updateDTO.getUsername())) {</span>
+<span class="nc" id="L99">            throw new RuntimeException(&quot;用户名已存在&quot;);</span>
+        }
+        
+        // 如果更新邮箱，检查是否存在
+<span class="nc bnc" id="L103" title="All 2 branches missed.">        if (updateDTO.getEmail() != null &amp;&amp; </span>
+<span class="nc bnc" id="L104" title="All 2 branches missed.">            !updateDTO.getEmail().equals(user.getEmail()) &amp;&amp;</span>
+<span class="nc bnc" id="L105" title="All 2 branches missed.">            existsByEmail(updateDTO.getEmail())) {</span>
+<span class="nc" id="L106">            throw new RuntimeException(&quot;邮箱已存在&quot;);</span>
+        }
+        
+        // 更新用户信息
+<span class="nc" id="L110">        BeanUtils.copyProperties(updateDTO, user, &quot;id&quot;, &quot;password&quot;, &quot;createTime&quot;);</span>
+        
+<span class="nc" id="L112">        adminUserRepository.updateById(user);</span>
+        
+<span class="nc" id="L114">        return convertToDTO(user);</span>
+    }
+
+    @Override
+    @Transactional
+    public boolean deleteUser(Long id) {
+<span class="nc" id="L120">        User user = adminUserRepository.selectById(id);</span>
+<span class="nc bnc" id="L121" title="All 2 branches missed.">        if (user == null) {</span>
+<span class="nc" id="L122">            throw new RuntimeException(&quot;用户不存在&quot;);</span>
+        }
+        
+        // 防止删除管理员
+<span class="nc bnc" id="L126" title="All 2 branches missed.">        if (&quot;admin&quot;.equals(user.getUsername())) {</span>
+<span class="nc" id="L127">            throw new RuntimeException(&quot;不能删除管理员用户&quot;);</span>
+        }
+        
+<span class="nc bnc" id="L130" title="All 2 branches missed.">        return adminUserRepository.deleteById(id) &gt; 0;</span>
+    }
+
+    @Override
+    @Transactional
+    public int batchDeleteUsers(List&lt;Long&gt; ids) {
+<span class="nc" id="L136">        int count = 0;</span>
+<span class="nc bnc" id="L137" title="All 2 branches missed.">        for (Long id : ids) {</span>
+<span class="nc" id="L138">            User user = adminUserRepository.selectById(id);</span>
+<span class="nc bnc" id="L139" title="All 4 branches missed.">            if (user != null &amp;&amp; !&quot;admin&quot;.equals(user.getUsername())) {</span>
+<span class="nc bnc" id="L140" title="All 2 branches missed.">                if (adminUserRepository.deleteById(id) &gt; 0) {</span>
+<span class="nc" id="L141">                    count++;</span>
+                }
+            }
+<span class="nc" id="L144">        }</span>
+<span class="nc" id="L145">        return count;</span>
+    }
+
+    @Override
+    @Transactional
+    public boolean updateUserStatus(Long id, Integer status) {
+<span class="nc" id="L151">        User user = adminUserRepository.selectById(id);</span>
+<span class="nc bnc" id="L152" title="All 2 branches missed.">        if (user == null) {</span>
+<span class="nc" id="L153">            throw new RuntimeException(&quot;用户不存在&quot;);</span>
+        }
+        
+        // 防止禁用管理员
+<span class="nc bnc" id="L157" title="All 4 branches missed.">        if (&quot;admin&quot;.equals(user.getUsername()) &amp;&amp; status == 0) {</span>
+<span class="nc" id="L158">            throw new RuntimeException(&quot;不能禁用管理员用户&quot;);</span>
+        }
+        
+<span class="nc bnc" id="L161" title="All 2 branches missed.">        return adminUserRepository.updateStatus(id, status) &gt; 0;</span>
+    }
+    
+    @Override
+    @Transactional
+    public int batchUpdateUserStatus(List&lt;Long&gt; ids, Integer status) {
+        // 检查是否包含管理员用户，防止禁用管理员
+<span class="nc bnc" id="L168" title="All 2 branches missed.">        for (Long id : ids) {</span>
+<span class="nc" id="L169">            User user = adminUserRepository.selectById(id);</span>
+<span class="nc bnc" id="L170" title="All 6 branches missed.">            if (user != null &amp;&amp; &quot;admin&quot;.equals(user.getUsername()) &amp;&amp; status == 0) {</span>
+<span class="nc" id="L171">                throw new RuntimeException(&quot;不能禁用管理员用户&quot;);</span>
+            }
+<span class="nc" id="L173">        }</span>
+        
+        // 批量更新用户状态
+<span class="nc" id="L176">        return adminUserRepository.updateUserStatus(ids, status);</span>
+    }
+
+    @Override
+    @Transactional
+    public boolean updateUserRole(Long id, Integer role) {
+<span class="nc" id="L182">        User user = adminUserRepository.selectById(id);</span>
+<span class="nc bnc" id="L183" title="All 2 branches missed.">        if (user == null) {</span>
+<span class="nc" id="L184">            throw new RuntimeException(&quot;用户不存在&quot;);</span>
+        }
+        
+        // 防止修改管理员角色
+<span class="nc bnc" id="L188" title="All 2 branches missed.">        if (&quot;admin&quot;.equals(user.getUsername())) {</span>
+<span class="nc" id="L189">            throw new RuntimeException(&quot;不能修改管理员角色&quot;);</span>
+        }
+        
+<span class="nc bnc" id="L192" title="All 2 branches missed.">        return adminUserRepository.updateRole(id, role) &gt; 0;</span>
+    }
+
+    @Override
+    @Transactional
+    public boolean resetPassword(Long id, String newPassword) {
+<span class="nc" id="L198">        User user = adminUserRepository.selectById(id);</span>
+<span class="nc bnc" id="L199" title="All 2 branches missed.">        if (user == null) {</span>
+<span class="nc" id="L200">            throw new RuntimeException(&quot;用户不存在&quot;);</span>
+        }
+        
+<span class="nc" id="L203">        String encodedPassword = passwordEncoder.encode(newPassword);</span>
+<span class="nc bnc" id="L204" title="All 2 branches missed.">        return adminUserRepository.updatePassword(id, encodedPassword) &gt; 0;</span>
+    }
+
+    @Override
+    public boolean existsByUsername(String username) {
+<span class="nc" id="L209">        return adminUserRepository.existsByUsername(username);</span>
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+<span class="nc" id="L214">        return adminUserRepository.existsByEmail(email);</span>
+    }
+
+    @Override
+    public Page&lt;UserDTO&gt; searchUsers(String keyword, Integer role, Integer status, Pageable pageable) {
+        // 使用PageHelper进行分页
+<span class="nc" id="L220">        PageHelper.startPage(pageable.getPageNumber() + 1, pageable.getPageSize());</span>
+        
+        // 构建搜索条件
+<span class="nc" id="L223">        UserSearchDTO searchDTO = new UserSearchDTO();</span>
+<span class="nc" id="L224">        searchDTO.setUsername(keyword);</span>
+<span class="nc" id="L225">        searchDTO.setRole(role);</span>
+<span class="nc" id="L226">        searchDTO.setStatus(status);</span>
+        
+        // 查询数据
+<span class="nc" id="L229">        List&lt;User&gt; users = adminUserRepository.selectUserList(searchDTO);</span>
+        
+        // 转换为DTO
+<span class="nc" id="L232">        List&lt;UserDTO&gt; userDTOs = users.stream()</span>
+<span class="nc" id="L233">                .map(this::convertToDTO)</span>
+<span class="nc" id="L234">                .collect(Collectors.toList());</span>
+        
+        // 转换为Spring Data的Page对象
+<span class="nc" id="L237">        PageInfo&lt;UserDTO&gt; pageInfo = new PageInfo&lt;&gt;(userDTOs);</span>
+<span class="nc" id="L238">        return new PageImpl&lt;&gt;(pageInfo.getList(), pageable, pageInfo.getTotal());</span>
+    }
+
+    @Override
+    public Object getUserStatistics() {
+<span class="nc" id="L243">        Map&lt;String, Object&gt; statistics = new HashMap&lt;&gt;();</span>
+        
+        // 查询总用户数
+<span class="nc" id="L246">        long totalUsers = adminUserRepository.countTotalUsers();</span>
+        
+        // 查询活跃用户数
+<span class="nc" id="L249">        long activeUsers = adminUserRepository.countActiveUsers();</span>
+        
+        // 查询管理员用户数
+<span class="nc" id="L252">        long adminUsers = adminUserRepository.countAdminUsers();</span>
+        
+        // 查询VIP用户数
+<span class="nc" id="L255">        long vipUsers = adminUserRepository.countVipUsers();</span>
+        
+<span class="nc" id="L257">        statistics.put(&quot;totalUsers&quot;, totalUsers);</span>
+<span class="nc" id="L258">        statistics.put(&quot;activeUsers&quot;, activeUsers);</span>
+<span class="nc" id="L259">        statistics.put(&quot;adminUsers&quot;, adminUsers);</span>
+<span class="nc" id="L260">        statistics.put(&quot;vipUsers&quot;, vipUsers);</span>
+        
+<span class="nc" id="L262">        return statistics;</span>
+    }
+
+    @Override
+    public List&lt;Map&lt;String, Object&gt;&gt; quickSearchUsers(String keyword, Integer limit) {
+        // 查询用户
+<span class="nc" id="L268">        List&lt;User&gt; users = adminUserRepository.quickSearchUsers(keyword, limit);</span>
+        
+        // 转换为简化的Map格式
+<span class="nc" id="L271">        List&lt;Map&lt;String, Object&gt;&gt; result = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L272" title="All 2 branches missed.">        for (User user : users) {</span>
+<span class="nc" id="L273">            Map&lt;String, Object&gt; userMap = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L274">            userMap.put(&quot;id&quot;, user.getId());</span>
+<span class="nc" id="L275">            userMap.put(&quot;username&quot;, user.getUsername());</span>
+<span class="nc" id="L276">            userMap.put(&quot;email&quot;, user.getEmail());</span>
+<span class="nc" id="L277">            userMap.put(&quot;role&quot;, user.getUserType());</span>
+<span class="nc" id="L278">            result.add(userMap);</span>
+<span class="nc" id="L279">        }</span>
+        
+<span class="nc" id="L281">        return result;</span>
+    }
+    
+    @Override
+    public Page&lt;UserDTO&gt; getAllUsers(Pageable pageable) {
+        // 使用PageHelper进行分页
+<span class="nc" id="L287">        PageHelper.startPage(pageable.getPageNumber() + 1, pageable.getPageSize());</span>
+        
+        // 查询所有用户（没有过滤条件）
+<span class="nc" id="L290">        List&lt;User&gt; users = adminUserRepository.selectList(null);</span>
+        
+        // 转换为DTO
+<span class="nc" id="L293">        List&lt;UserDTO&gt; userDTOs = users.stream()</span>
+<span class="nc" id="L294">                .map(this::convertToDTO)</span>
+<span class="nc" id="L295">                .collect(Collectors.toList());</span>
+        
+        // 转换为Spring Data的Page对象
+<span class="nc" id="L298">        PageInfo&lt;UserDTO&gt; pageInfo = new PageInfo&lt;&gt;(userDTOs);</span>
+<span class="nc" id="L299">        return new PageImpl&lt;&gt;(pageInfo.getList(), pageable, pageInfo.getTotal());</span>
+    }
+
+    /**
+     * 实体转DTO
+     */
+    private UserDTO convertToDTO(User user) {
+<span class="nc" id="L306">        UserDTO dto = new UserDTO();</span>
+<span class="nc" id="L307">        BeanUtils.copyProperties(user, dto);</span>
+        // 注意：前端使用role字段，后端使用userType字段
+        // 0-普通用户，1-VIP用户，2-管理员
+<span class="nc bnc" id="L310" title="All 2 branches missed.">        if (user.getUserType() != null) {</span>
+<span class="nc bnc" id="L311" title="All 4 branches missed.">            switch (user.getUserType()) {</span>
+                case 0: 
+<span class="nc" id="L313">                    dto.setRole(&quot;user&quot;);</span>
+<span class="nc" id="L314">                    break;</span>
+                case 1: 
+<span class="nc" id="L316">                    dto.setRole(&quot;vip&quot;);</span>
+<span class="nc" id="L317">                    break;</span>
+                case 2: 
+<span class="nc" id="L319">                    dto.setRole(&quot;admin&quot;);</span>
+<span class="nc" id="L320">                    break;</span>
+                default: 
+<span class="nc" id="L322">                    dto.setRole(&quot;user&quot;);</span>
+            }
+        } else {
+<span class="nc" id="L325">            dto.setRole(&quot;user&quot;);</span>
+        }
+<span class="nc" id="L327">        return dto;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

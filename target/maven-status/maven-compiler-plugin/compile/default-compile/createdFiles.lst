@@ -1,0 +1,8 @@
+com/retail/repository/ProductRepository.class
+com/retail/repository/AdminProductRepository.class
+com/retail/repository/OrderRepository.class
+com/retail/common/GlobalExceptionHandler.class
+com/retail/repository/AdminOrderRepository.class
+com/retail/repository/UserRepository.class
+com/retail/common/OrderStatusEnum.class
+com/retail/repository/AdminUserRepository.class

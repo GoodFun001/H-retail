@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JwtAuthenticationFilter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">retail-platform</a> &gt; <a href="index.source.html" class="el_package">com.retail.config</a> &gt; <span class="el_source">JwtAuthenticationFilter.java</span></div><h1>JwtAuthenticationFilter.java</h1><pre class="source lang-java linenums">package com.retail.config;
+
+import com.retail.util.JwtUtil;
+import com.retail.util.RedisUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+
+/**
+ * JWT认证过滤器
+ */
+<span class="fc" id="L26">@Slf4j</span>
+@Component
+<span class="fc" id="L28">public class JwtAuthenticationFilter extends OncePerRequestFilter {</span>
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    @Autowired
+    private RedisUtil redisUtil;
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, 
+                                HttpServletResponse response, 
+                                FilterChain filterChain) throws ServletException, IOException {
+        
+<span class="nc" id="L41">        String token = getTokenFromRequest(request);</span>
+<span class="nc" id="L42">        log.info(&quot;请求URL: {}&quot;, request.getRequestURI());</span>
+        
+<span class="nc bnc" id="L44" title="All 4 branches missed.">        if (token != null &amp;&amp; !jwtUtil.isTokenExpired(token)) {</span>
+            // =================================================================
+            // ==                      核心修改点在这里                        ==
+            // =================================================================
+            // 将 Redis Key 的前缀设置为 &quot;user:session:&quot;
+            // 以匹配 UserServiceImpl 中存入的键
+<span class="nc" id="L50">            String userKey = &quot;user:session:&quot; + token;</span>
+<span class="nc" id="L51">            Object userInfo = redisUtil.get(userKey);</span>
+            
+<span class="nc bnc" id="L53" title="All 2 branches missed.">            if (userInfo != null) {</span>
+<span class="nc" id="L54">                log.info(&quot;从Redis获取的用户信息: {}&quot;, userInfo);</span>
+
+                // 为用户创建一个默认的权限列表
+<span class="nc" id="L57">                List&lt;GrantedAuthority&gt; authorities = Collections.singletonList(new SimpleGrantedAuthority(&quot;ROLE_USER&quot;));</span>
+                
+                // 创建认证对象，并传入权限列表
+<span class="nc" id="L60">                UsernamePasswordAuthenticationToken authentication = </span>
+                    new UsernamePasswordAuthenticationToken(userInfo, null, authorities);
+                
+<span class="nc" id="L63">                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));</span>
+                
+                // 设置到Security上下文
+<span class="nc" id="L66">                SecurityContextHolder.getContext().setAuthentication(authentication);</span>
+<span class="nc" id="L67">                log.info(&quot;用户认证成功，并授予 ROLE_USER 权限，设置了SecurityContext&quot;);</span>
+<span class="nc" id="L68">            } else {</span>
+<span class="nc" id="L69">                log.warn(&quot;Redis中未找到用户会话，Token可能已失效或被手动登出。Key: {}&quot;, userKey);</span>
+            }
+        }
+        
+<span class="nc" id="L73">        filterChain.doFilter(request, response);</span>
+<span class="nc" id="L74">    }</span>
+
+    /**
+     * 从请求中获取Token
+     */
+    private String getTokenFromRequest(HttpServletRequest request) {
+<span class="nc" id="L80">        String bearerToken = request.getHeader(&quot;Authorization&quot;);</span>
+<span class="nc bnc" id="L81" title="All 4 branches missed.">        if (bearerToken != null &amp;&amp; bearerToken.startsWith(&quot;Bearer &quot;)) {</span>
+<span class="nc" id="L82">            return bearerToken.substring(7);</span>
+        }
+<span class="nc" id="L84">        return null;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

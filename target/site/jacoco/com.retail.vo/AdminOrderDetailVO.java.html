@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AdminOrderDetailVO.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">retail-platform</a> &gt; <a href="index.source.html" class="el_package">com.retail.vo</a> &gt; <span class="el_source">AdminOrderDetailVO.java</span></div><h1>AdminOrderDetailVO.java</h1><pre class="source lang-java linenums">package com.retail.vo;
+
+import com.retail.entity.Order;
+import lombok.Data;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+/**
+ * 管理员订单详情VO
+ */
+<span class="pc bnc" id="L12" title="All 166 branches missed.">@Data</span>
+public class AdminOrderDetailVO {
+<span class="fc" id="L14">    private Long id;</span>
+<span class="fc" id="L15">    private String orderNo;</span>
+<span class="fc" id="L16">    private Long userId;</span>
+<span class="fc" id="L17">    private String receiverName;</span>
+<span class="fc" id="L18">    private String phone;</span>
+<span class="fc" id="L19">    private String address;</span>
+<span class="fc" id="L20">    private BigDecimal payAmount;</span>
+<span class="fc" id="L21">    private BigDecimal totalAmount;</span>
+<span class="fc" id="L22">    private Integer payMethod;</span>
+<span class="fc" id="L23">    private Integer status;</span>
+<span class="fc" id="L24">    private String statusName;</span>
+<span class="fc" id="L25">    private String payMethodName;</span>
+<span class="fc" id="L26">    private LocalDateTime createTime;</span>
+<span class="fc" id="L27">    private LocalDateTime payTime;</span>
+<span class="fc" id="L28">    private LocalDateTime updateTime;</span>
+<span class="fc" id="L29">    private Integer deleted;</span>
+<span class="fc" id="L30">    private Long productId;</span>
+<span class="fc" id="L31">    private String productName;</span>
+<span class="fc" id="L32">    private BigDecimal productPrice;</span>
+<span class="fc" id="L33">    private Integer quantity;</span>
+
+    /**
+     * 将Order实体转换为AdminOrderDetailVO（null-safe）
+     */
+    public static AdminOrderDetailVO fromOrder(Order order) {
+<span class="fc" id="L39">        AdminOrderDetailVO vo = new AdminOrderDetailVO();</span>
+<span class="fc" id="L40">        vo.setId(order.getId());</span>
+<span class="fc" id="L41">        vo.setOrderNo(order.getOrderNo());</span>
+<span class="fc" id="L42">        vo.setUserId(order.getUserId());</span>
+<span class="fc" id="L43">        vo.setReceiverName(order.getReceiverName());</span>
+<span class="fc" id="L44">        vo.setPhone(order.getPhone());</span>
+<span class="fc" id="L45">        vo.setAddress(order.getAddress());</span>
+<span class="fc" id="L46">        vo.setPayAmount(order.getPayAmount());</span>
+<span class="fc" id="L47">        vo.setTotalAmount(order.getTotalAmount());</span>
+<span class="fc" id="L48">        vo.setPayMethod(order.getPayMethod());</span>
+<span class="fc" id="L49">        vo.setStatus(order.getStatus());</span>
+<span class="fc" id="L50">        vo.setStatusName(order.getStatusName());</span>
+<span class="pc bpc" id="L51" title="1 of 2 branches missed.">        vo.setPayMethodName(order.getPayMethod() != null ? order.getPayMethodName() : null);</span>
+<span class="fc" id="L52">        vo.setCreateTime(order.getCreateTime());</span>
+<span class="fc" id="L53">        vo.setPayTime(order.getPayTime());</span>
+<span class="fc" id="L54">        vo.setUpdateTime(order.getUpdateTime());</span>
+<span class="fc" id="L55">        vo.setDeleted(order.getDeleted());</span>
+<span class="fc" id="L56">        vo.setProductId(order.getProductId());</span>
+<span class="fc" id="L57">        vo.setProductName(order.getProductName());</span>
+<span class="fc" id="L58">        vo.setProductPrice(order.getProductPrice());</span>
+<span class="fc" id="L59">        vo.setQuantity(order.getQuantity());</span>
+<span class="fc" id="L60">        return vo;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

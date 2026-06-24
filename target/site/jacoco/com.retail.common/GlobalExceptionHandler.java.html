@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GlobalExceptionHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">retail-platform</a> &gt; <a href="index.source.html" class="el_package">com.retail.common</a> &gt; <span class="el_source">GlobalExceptionHandler.java</span></div><h1>GlobalExceptionHandler.java</h1><pre class="source lang-java linenums">package com.retail.common;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+/**
+ * 全局异常处理器
+ * 【重构新增】统一处理Controller层的异常，替代各处分散的try-catch
+ */
+<span class="fc" id="L13">@Slf4j</span>
+@RestControllerAdvice
+<span class="fc" id="L15">public class GlobalExceptionHandler {</span>
+
+    @ExceptionHandler(RuntimeException.class)
+    @ResponseStatus(HttpStatus.OK)
+    public Result&lt;Void&gt; handleRuntimeException(RuntimeException e) {
+<span class="nc" id="L20">        log.error(&quot;运行时异常: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L21">        return Result.error(500, e.getMessage());</span>
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.OK)
+    public Result&lt;Void&gt; handleIllegalArgumentException(IllegalArgumentException e) {
+<span class="nc" id="L27">        log.warn(&quot;参数校验异常: {}&quot;, e.getMessage());</span>
+<span class="nc" id="L28">        return Result.paramError(e.getMessage());</span>
+    }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.OK)
+    public Result&lt;Void&gt; handleException(Exception e) {
+<span class="nc" id="L34">        log.error(&quot;系统异常: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L35">        return Result.error(&quot;系统内部错误&quot;);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

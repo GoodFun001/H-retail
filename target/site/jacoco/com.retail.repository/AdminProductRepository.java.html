@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AdminProductRepository.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">retail-platform</a> &gt; <a href="index.source.html" class="el_package">com.retail.repository</a> &gt; <span class="el_source">AdminProductRepository.java</span></div><h1>AdminProductRepository.java</h1><pre class="source lang-java linenums">package com.retail.repository;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.retail.entity.Product;
+import com.retail.mapper.AdminProductMapper;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+/**
+ * 管理员商品Repository层
+ * 封装AdminProductMapper的数据访问操作，提供业务语义化的数据查询方法
+ */
+<span class="nc" id="L18">@Slf4j</span>
+@Repository
+<span class="nc" id="L20">@RequiredArgsConstructor</span>
+public class AdminProductRepository {
+
+    private final AdminProductMapper adminProductMapper;
+
+    /**
+     * 根据ID查询商品
+     */
+    public Product findById(Long id) {
+<span class="nc" id="L29">        return adminProductMapper.selectById(id);</span>
+    }
+
+    /**
+     * 根据ID查询商品（别名，兼容旧代码）
+     */
+    public Product selectById(Long id) {
+<span class="nc" id="L36">        return findById(id);</span>
+    }
+
+    /**
+     * 分页查询商品
+     */
+    public Page&lt;Product&gt; selectPage(Page&lt;Product&gt; page, LambdaQueryWrapper&lt;Product&gt; wrapper) {
+<span class="nc" id="L43">        return adminProductMapper.selectPage(page, wrapper);</span>
+    }
+
+    /**
+     * 条件查询商品列表
+     */
+    public List&lt;Product&gt; selectList(LambdaQueryWrapper&lt;Product&gt; wrapper) {
+<span class="nc" id="L50">        return adminProductMapper.selectList(wrapper);</span>
+    }
+
+    /**
+     * 保存商品
+     */
+    public int insert(Product product) {
+<span class="nc" id="L57">        return adminProductMapper.insert(product);</span>
+    }
+
+    /**
+     * 更新商品
+     */
+    public int update(Product product) {
+<span class="nc" id="L64">        return adminProductMapper.updateById(product);</span>
+    }
+
+    /**
+     * 更新商品（别名，兼容旧代码）
+     */
+    public int updateById(Product product) {
+<span class="nc" id="L71">        return adminProductMapper.updateById(product);</span>
+    }
+
+    /**
+     * 根据ID删除商品
+     */
+    public int deleteById(Long id) {
+<span class="nc" id="L78">        return adminProductMapper.deleteById(id);</span>
+    }
+
+    /**
+     * 批量删除商品
+     */
+    public int deleteBatchIds(List&lt;Long&gt; ids) {
+<span class="nc" id="L85">        return adminProductMapper.deleteBatchIds(ids);</span>
+    }
+
+    /**
+     * 条件更新商品（兼容MyBatis Plus原生调用方式）
+     */
+    public int update(Product entity, LambdaUpdateWrapper&lt;Product&gt; updateWrapper) {
+<span class="nc" id="L92">        return adminProductMapper.update(entity, updateWrapper);</span>
+    }
+
+    /**
+     * 条件统计商品数量
+     */
+    public Long selectCount(LambdaQueryWrapper&lt;Product&gt; wrapper) {
+<span class="nc" id="L99">        return adminProductMapper.selectCount(wrapper);</span>
+    }
+
+    /**
+     * 获取所有不同的产品分类
+     */
+    public List&lt;Integer&gt; selectDistinctCategories() {
+<span class="nc" id="L106">        return adminProductMapper.selectDistinctCategories();</span>
+    }
+
+    /**
+     * 查询所有商品
+     */
+    public List&lt;Product&gt; findAll() {
+<span class="nc" id="L113">        return adminProductMapper.selectList(null);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

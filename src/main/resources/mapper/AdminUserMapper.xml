@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.retail.mapper.AdminUserMapper">
+
+    <!-- 用户结果映射 -->
+    <resultMap id="BaseResultMap" type="com.retail.entity.User">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="username" property="username" jdbcType="VARCHAR"/>
+        <result column="password" property="password" jdbcType="VARCHAR"/>
+        <result column="phone" property="phone" jdbcType="VARCHAR"/>
+        <result column="email" property="email" jdbcType="VARCHAR"/>
+        <result column="user_type" property="userType" jdbcType="INTEGER"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="real_name" property="realName" jdbcType="VARCHAR"/>
+        <result column="avatar" property="avatar" jdbcType="VARCHAR"/>
+        <result column="vip_expire_time" property="vipExpireTime" jdbcType="TIMESTAMP"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="deleted" property="deleted" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!-- 基础列 -->
+    <sql id="Base_Column_List">
+        id, username, password, phone, email, user_type, status, real_name, avatar, vip_expire_time,
+        create_time, update_time, deleted
+    </sql>
+
+    <!-- 不包含密码的列 -->
+    <sql id="Base_Column_List_No_Password">
+        id, username, phone, email, user_type, status, real_name, avatar, vip_expire_time,
+        create_time, update_time, deleted
+    </sql>
+
+    <!-- 分页查询用户列表 -->
+    <select id="selectUserListWithPage" resultMap="BaseResultMap">
+        SELECT 
+            <include refid="Base_Column_List_No_Password"/>
+        FROM user
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (
+                    username LIKE CONCAT('%', #{keyword}, '%')
+                    OR email LIKE CONCAT('%', #{keyword}, '%')
+                    OR phone LIKE CONCAT('%', #{keyword}, '%')
+                    OR real_name LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+            <if test="userType != null">
+                AND user_type = #{userType}
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+            <if test="startCreateTime != null">
+                AND create_time &gt;= #{startCreateTime}
+            </if>
+            <if test="endCreateTime != null">
+                AND create_time &lt;= #{endCreateTime}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 根据ID查询用户 -->
+    <select id="selectUserById" resultMap="BaseResultMap">
+        SELECT 
+            <include refid="Base_Column_List_No_Password"/>
+        FROM user
+        WHERE id = #{id}
+    </select>
+
+    <!-- 根据用户名查询用户（包含密码） -->
+    <select id="selectUserByUsername" resultMap="BaseResultMap">
+        SELECT 
+            <include refid="Base_Column_List"/>
+        FROM user
+        WHERE username = #{username}
+    </select>
+
+    <!-- 检查用户名是否存在 -->
+    <select id="checkUsernameExists" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM user
+        WHERE username = #{username}
+        <if test="excludeId != null">
+            AND id != #{excludeId}
+        </if>
+    </select>
+
+    <!-- 检查邮箱是否存在 -->
+    <select id="checkEmailExists" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM user
+        WHERE email = #{email}
+        <if test="excludeId != null">
+            AND id != #{excludeId}
+        </if>
+    </select>
+
+    <!-- 检查手机号是否存在 -->
+    <select id="checkPhoneExists" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM user
+        WHERE phone = #{phone}
+        <if test="excludeId != null">
+            AND id != #{excludeId}
+        </if>
+    </select>
+
+    <!-- 插入用户 -->
+    <insert id="insertUser" parameterType="com.retail.entity.User" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user (
+            username, password, phone, email, user_type, status, real_name, avatar, vip_expire_time,
+            create_time, update_time, deleted
+        ) VALUES (
+            #{username}, #{password}, #{phone}, #{email}, #{userType}, #{status}, #{realName}, #{avatar}, #{vipExpireTime},
+            #{createTime}, #{updateTime}, #{deleted}
+        )
+    </insert>
+
+    <!-- 更新用户 -->
+    <update id="updateUser" parameterType="com.retail.entity.User">
+        UPDATE user
+        <set>
+            <if test="username != null">username = #{username},</if>
+            <if test="password != null">password = #{password},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="userType != null">user_type = #{userType},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="realName != null">real_name = #{realName},</if>
+            <if test="avatar != null">avatar = #{avatar},</if>
+            <if test="vipExpireTime != null">vip_expire_time = #{vipExpireTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="deleted != null">deleted = #{deleted}</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!-- 更新用户状态 -->
+    <update id="updateUserStatus">
+        UPDATE user SET status = #{status}, update_time = NOW()
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </update>
+
+    <!-- 批量删除用户 -->
+    <delete id="batchDeleteUsers">
+        DELETE FROM user
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!-- 统计用户总数 -->
+    <select id="countTotalUsers" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM user
+    </select>
+
+    <!-- 统计活跃用户数 -->
+    <select id="countActiveUsers" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM user WHERE status = 1
+    </select>
+
+    <!-- 统计今日新增用户数 -->
+    <select id="countTodayNewUsers" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM user
+        WHERE DATE(create_time) = CURDATE()
+    </select>
+
+    <!-- 统计本月新增用户数 -->
+    <select id="countMonthNewUsers" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM user
+        WHERE YEAR(create_time) = YEAR(CURDATE())
+        AND MONTH(create_time) = MONTH(CURDATE())
+    </select>
+
+    <!-- 按用户类型统计用户数 -->
+    <select id="countUsersByUserType" resultType="java.util.Map">
+        SELECT 
+            user_type as userTypeName,
+            COUNT(*) as count
+        FROM user
+        GROUP BY user_type
+    </select>
+
+    <!-- 按状态统计用户数 -->
+    <select id="countUsersByStatus" resultType="java.util.Map">
+        SELECT 
+            status,
+            COUNT(*) as count
+        FROM user
+        GROUP BY status
+    </select>
+
+    <!-- 按注册时间统计用户数（最近7天） -->
+    <select id="countUsersByRecentDays" resultType="java.util.Map">
+        SELECT 
+            DATE(create_time) as date,
+            COUNT(*) as count
+        FROM user
+        WHERE create_time >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+        GROUP BY DATE(create_time)
+        ORDER BY date
+    </select>
+
+    <!-- 按注册时间统计用户数（最近30天） -->
+    <select id="countUsersByRecent30Days" resultType="java.util.Map">
+        SELECT 
+            DATE(create_time) as date,
+            COUNT(*) as count
+        FROM user
+        WHERE create_time >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+        GROUP BY DATE(create_time)
+        ORDER BY date
+    </select>
+
+</mapper>

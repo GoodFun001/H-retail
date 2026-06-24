@@ -1,0 +1,503 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AdminOrderServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">retail-platform</a> &gt; <a href="index.source.html" class="el_package">com.retail.service.impl</a> &gt; <span class="el_source">AdminOrderServiceImpl.java</span></div><h1>AdminOrderServiceImpl.java</h1><pre class="source lang-java linenums">package com.retail.service.impl;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.retail.common.OrderStatusEnum;
+import com.retail.dto.OrderCreateDTO;
+import com.retail.dto.OrderSearchDTO;
+import com.retail.dto.OrderUpdateDTO;
+import com.retail.entity.Order;
+import com.retail.entity.Product;
+import com.retail.repository.AdminOrderRepository;
+import com.retail.repository.ProductRepository;
+import com.retail.service.AdminOrderService;
+import com.retail.vo.AdminOrderDetailVO;
+import com.retail.vo.OrderDetailVO;
+import com.retail.vo.OrderVO;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+/**
+ * 管理员订单服务实现类
+ * 
+ * 【重构说明】
+ * 1. 使用统一的 OrderStatusEnum 替代内部枚举
+ * 2. 新增 getAdminOrderDetail() / adminUpdateOrder() / searchOrders(String,Long) 方法
+ * 3. 将原 Controller 中的数据操作逻辑移至 Service 层
+ * 4. 引入Repository层，Service通过AdminOrderRepository/ProductRepository访问数据
+ */
+<span class="fc" id="L41">@Slf4j</span>
+@Service
+<span class="fc" id="L43">@RequiredArgsConstructor</span>
+public class AdminOrderServiceImpl implements AdminOrderService {
+
+    private final AdminOrderRepository adminOrderRepository;
+    private final ProductRepository productRepository;
+
+    @Override
+    @Transactional
+    public OrderVO createOrder(OrderCreateDTO createDTO) {
+        // 简化实现，只处理第一个订单项
+<span class="nc bnc" id="L53" title="All 4 branches missed.">        if (createDTO.getItems() == null || createDTO.getItems().isEmpty()) {</span>
+<span class="nc" id="L54">            throw new RuntimeException(&quot;订单项不能为空&quot;);</span>
+        }
+        
+<span class="nc" id="L57">        OrderCreateDTO.OrderItemDTO itemDTO = createDTO.getItems().get(0);</span>
+<span class="nc" id="L58">        log.info(&quot;管理员创建订单，用户ID: 1, 商品ID: {}, 数量: {}&quot;, itemDTO.getProductId(), itemDTO.getQuantity());</span>
+
+        // 检查商品是否存在且有足够库存
+<span class="nc" id="L61">        Product product = productRepository.selectById(itemDTO.getProductId());</span>
+<span class="nc bnc" id="L62" title="All 2 branches missed.">        if (product == null) {</span>
+<span class="nc" id="L63">            throw new RuntimeException(&quot;商品不存在&quot;);</span>
+        }
+        
+<span class="nc bnc" id="L66" title="All 2 branches missed.">        if (product.getStock() &lt; itemDTO.getQuantity()) {</span>
+<span class="nc" id="L67">            throw new RuntimeException(&quot;商品库存不足&quot;);</span>
+        }
+
+        // 计算总价
+<span class="nc" id="L71">        BigDecimal totalPrice = product.getPrice().multiply(new BigDecimal(itemDTO.getQuantity()));</span>
+
+        // 创建订单
+<span class="nc" id="L74">        Order order = new Order();</span>
+<span class="nc" id="L75">        order.setOrderNo(generateOrderNo());</span>
+        // 暂时硬编码用户ID为1，因为OrderCreateDTO中没有userId字段
+<span class="nc" id="L77">        order.setUserId(1L);</span>
+<span class="nc" id="L78">        order.setProductId(itemDTO.getProductId());</span>
+<span class="nc" id="L79">        order.setQuantity(itemDTO.getQuantity());</span>
+<span class="nc" id="L80">        order.setTotalAmount(totalPrice);</span>
+<span class="nc" id="L81">        order.setStatus(OrderStatusEnum.PENDING_PAYMENT.getCode());</span>
+<span class="nc" id="L82">        order.setCreateTime(LocalDateTime.now());</span>
+<span class="nc" id="L83">        order.setUpdateTime(LocalDateTime.now());</span>
+
+<span class="nc" id="L85">        adminOrderRepository.insert(order);</span>
+
+        // 扣减商品库存
+<span class="nc" id="L88">        product.setStock(product.getStock() - itemDTO.getQuantity());</span>
+<span class="nc" id="L89">        productRepository.updateById(product);</span>
+
+<span class="nc" id="L91">        log.info(&quot;订单创建成功，订单号: {}&quot;, order.getOrderNo());</span>
+<span class="nc" id="L92">        return convertToVO(order);</span>
+    }
+
+    @Override
+    public OrderDetailVO getOrderById(Long id) {
+<span class="fc" id="L97">        Order order = adminOrderRepository.selectById(id);</span>
+<span class="fc bfc" id="L98" title="All 2 branches covered.">        if (order == null) {</span>
+<span class="fc" id="L99">            throw new RuntimeException(&quot;订单不存在&quot;);</span>
+        }
+<span class="fc" id="L101">        return convertToDetailVO(order);</span>
+    }
+
+    @Override
+    public Map&lt;String, Object&gt; searchOrders(OrderSearchDTO searchDTO) {
+<span class="nc" id="L106">        log.info(&quot;搜索订单，条件: {}&quot;, searchDTO);</span>
+
+        // 构建查询条件
+<span class="nc" id="L109">        LambdaQueryWrapper&lt;Order&gt; queryWrapper = new LambdaQueryWrapper&lt;Order&gt;()</span>
+<span class="nc bnc" id="L110" title="All 2 branches missed.">                .eq(searchDTO.getUserId() != null, Order::getUserId, searchDTO.getUserId())</span>
+<span class="nc bnc" id="L111" title="All 4 branches missed.">                .like(searchDTO.getOrderNo() != null &amp;&amp; !searchDTO.getOrderNo().isEmpty(), </span>
+<span class="nc" id="L112">                      Order::getOrderNo, searchDTO.getOrderNo())</span>
+<span class="nc" id="L113">                .orderByDesc(Order::getCreateTime);</span>
+
+        // 处理订单状态
+<span class="nc bnc" id="L116" title="All 4 branches missed.">        if (searchDTO.getStatus() != null &amp;&amp; !searchDTO.getStatus().isEmpty()) {</span>
+<span class="nc" id="L117">            Integer statusCode = convertOrderStatus(searchDTO.getStatus());</span>
+<span class="nc bnc" id="L118" title="All 2 branches missed.">            if (statusCode != null) {</span>
+<span class="nc" id="L119">                queryWrapper.eq(Order::getStatus, statusCode);</span>
+            }
+        }
+
+        // 分页查询
+<span class="nc" id="L124">        Page&lt;Order&gt; page = new Page&lt;&gt;(searchDTO.getPage(), searchDTO.getSize());</span>
+<span class="nc" id="L125">        IPage&lt;Order&gt; pageResult = adminOrderRepository.selectPage(page, queryWrapper);</span>
+
+        // 转换结果
+<span class="nc" id="L128">        Map&lt;String, Object&gt; result = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L129">        result.put(&quot;records&quot;, pageResult.getRecords().stream()</span>
+<span class="nc" id="L130">                .map(this::convertToVO)</span>
+<span class="nc" id="L131">                .collect(Collectors.toList()));</span>
+<span class="nc" id="L132">        result.put(&quot;total&quot;, pageResult.getTotal());</span>
+<span class="nc" id="L133">        result.put(&quot;current&quot;, pageResult.getCurrent());</span>
+<span class="nc" id="L134">        result.put(&quot;size&quot;, pageResult.getSize());</span>
+<span class="nc" id="L135">        result.put(&quot;pages&quot;, pageResult.getPages());</span>
+
+<span class="nc" id="L137">        return result;</span>
+    }
+
+    /**
+     * 将字符串状态转换为整数状态码（使用统一的OrderStatusEnum）
+     */
+    private Integer convertOrderStatus(String status) {
+<span class="nc" id="L144">        return OrderStatusEnum.resolveCode(status);</span>
+    }
+
+    @Override
+    @Transactional
+    public OrderVO updateOrder(Long id, OrderUpdateDTO updateDTO) {
+<span class="nc" id="L150">        Order order = adminOrderRepository.selectById(id);</span>
+<span class="nc bnc" id="L151" title="All 2 branches missed.">        if (order == null) {</span>
+<span class="nc" id="L152">            throw new RuntimeException(&quot;订单不存在&quot;);</span>
+        }
+
+        // 检查订单状态是否允许修改
+<span class="nc bnc" id="L156" title="All 2 branches missed.">        if (order.getStatus() == OrderStatusEnum.COMPLETED.getCode() || </span>
+<span class="nc bnc" id="L157" title="All 2 branches missed.">            order.getStatus() == OrderStatusEnum.CANCELLED.getCode()) {</span>
+<span class="nc" id="L158">            throw new RuntimeException(&quot;订单已完成或已取消，无法修改&quot;);</span>
+        }
+
+        // 更新数量（需要重新计算价格和检查库存）
+<span class="nc bnc" id="L162" title="All 4 branches missed.">        if (updateDTO.getQuantity() != null &amp;&amp; !updateDTO.getQuantity().equals(order.getQuantity())) {</span>
+<span class="nc" id="L163">            Product product = productRepository.selectById(order.getProductId());</span>
+            
+            // 恢复原库存
+<span class="nc" id="L166">            int currentStock = product.getStock() + order.getQuantity();</span>
+            
+            // 检查新库存是否足够
+<span class="nc bnc" id="L169" title="All 2 branches missed.">            if (currentStock &lt; updateDTO.getQuantity()) {</span>
+<span class="nc" id="L170">                throw new RuntimeException(&quot;商品库存不足&quot;);</span>
+            }
+            
+            // 更新库存
+<span class="nc" id="L174">            product.setStock(currentStock - updateDTO.getQuantity());</span>
+<span class="nc" id="L175">            productRepository.updateById(product);</span>
+            
+            // 更新订单数量和总价
+<span class="nc" id="L178">            order.setQuantity(updateDTO.getQuantity());</span>
+<span class="nc" id="L179">            order.setTotalAmount(product.getPrice().multiply(new BigDecimal(updateDTO.getQuantity())));</span>
+        }
+
+<span class="nc" id="L182">        order.setUpdateTime(LocalDateTime.now());</span>
+<span class="nc" id="L183">        adminOrderRepository.updateById(order);</span>
+
+<span class="nc" id="L185">        log.info(&quot;订单更新成功，ID: {}&quot;, id);</span>
+<span class="nc" id="L186">        return convertToVO(order);</span>
+    }
+
+    @Override
+    @Transactional
+    public void cancelOrder(Long id) {
+<span class="fc" id="L192">        Order order = adminOrderRepository.selectById(id);</span>
+<span class="pc bpc" id="L193" title="1 of 2 branches missed.">        if (order == null) {</span>
+<span class="nc" id="L194">            throw new RuntimeException(&quot;订单不存在&quot;);</span>
+        }
+
+<span class="pc bpc" id="L197" title="1 of 2 branches missed.">        if (order.getStatus() == OrderStatusEnum.CANCELLED.getCode()) {</span>
+<span class="nc" id="L198">            throw new RuntimeException(&quot;订单已取消&quot;);</span>
+        }
+
+<span class="pc bpc" id="L201" title="1 of 2 branches missed.">        if (order.getStatus() == OrderStatusEnum.COMPLETED.getCode()) {</span>
+<span class="nc" id="L202">            throw new RuntimeException(&quot;订单已完成，无法取消&quot;);</span>
+        }
+
+        // 恢复商品库存
+<span class="fc" id="L206">        Product product = productRepository.selectById(order.getProductId());</span>
+<span class="pc bpc" id="L207" title="1 of 2 branches missed.">        if (product != null) {</span>
+<span class="fc" id="L208">            product.setStock(product.getStock() + order.getQuantity());</span>
+<span class="fc" id="L209">            productRepository.updateById(product);</span>
+        }
+
+        // 更新订单状态
+<span class="fc" id="L213">        order.setStatus(OrderStatusEnum.CANCELLED.getCode());</span>
+<span class="fc" id="L214">        order.setUpdateTime(LocalDateTime.now());</span>
+<span class="fc" id="L215">        adminOrderRepository.updateById(order);</span>
+
+<span class="fc" id="L217">        log.info(&quot;订单取消成功，ID: {}&quot;, id);</span>
+<span class="fc" id="L218">    }</span>
+
+    @Override
+    @Transactional
+    public void confirmPayment(Long id) {
+<span class="fc" id="L223">        Order order = adminOrderRepository.selectById(id);</span>
+<span class="pc bpc" id="L224" title="1 of 2 branches missed.">        if (order == null) {</span>
+<span class="nc" id="L225">            throw new RuntimeException(&quot;订单不存在&quot;);</span>
+        }
+
+<span class="fc bfc" id="L228" title="All 2 branches covered.">        if (order.getStatus() != OrderStatusEnum.PENDING_PAYMENT.getCode()) {</span>
+<span class="fc" id="L229">            throw new RuntimeException(&quot;订单状态不正确，无法确认支付&quot;);</span>
+        }
+
+<span class="fc" id="L232">        order.setStatus(OrderStatusEnum.PAID.getCode());</span>
+<span class="fc" id="L233">        order.setUpdateTime(LocalDateTime.now());</span>
+<span class="fc" id="L234">        adminOrderRepository.updateById(order);</span>
+
+<span class="fc" id="L236">        log.info(&quot;订单支付确认成功，ID: {}&quot;, id);</span>
+<span class="fc" id="L237">    }</span>
+
+    @Override
+    @Transactional
+    public void shipOrder(Long id) {
+<span class="fc" id="L242">        Order order = adminOrderRepository.selectById(id);</span>
+<span class="pc bpc" id="L243" title="1 of 2 branches missed.">        if (order == null) {</span>
+<span class="nc" id="L244">            throw new RuntimeException(&quot;订单不存在&quot;);</span>
+        }
+
+<span class="pc bpc" id="L247" title="1 of 2 branches missed.">        if (order.getStatus() != OrderStatusEnum.PAID.getCode()) {</span>
+<span class="nc" id="L248">            throw new RuntimeException(&quot;订单未支付，无法发货&quot;);</span>
+        }
+
+<span class="fc" id="L251">        order.setStatus(OrderStatusEnum.SHIPPED.getCode());</span>
+<span class="fc" id="L252">        order.setUpdateTime(LocalDateTime.now());</span>
+<span class="fc" id="L253">        adminOrderRepository.updateById(order);</span>
+
+<span class="fc" id="L255">        log.info(&quot;订单发货成功，ID: {}&quot;, id);</span>
+<span class="fc" id="L256">    }</span>
+
+    @Override
+    @Transactional
+    public void completeOrder(Long id) {
+<span class="fc" id="L261">        Order order = adminOrderRepository.selectById(id);</span>
+<span class="pc bpc" id="L262" title="1 of 2 branches missed.">        if (order == null) {</span>
+<span class="nc" id="L263">            throw new RuntimeException(&quot;订单不存在&quot;);</span>
+        }
+
+<span class="pc bpc" id="L266" title="1 of 2 branches missed.">        if (order.getStatus() != OrderStatusEnum.SHIPPED.getCode()) {</span>
+<span class="nc" id="L267">            throw new RuntimeException(&quot;订单未发货，无法完成&quot;);</span>
+        }
+
+<span class="fc" id="L270">        order.setStatus(OrderStatusEnum.COMPLETED.getCode());</span>
+<span class="fc" id="L271">        order.setUpdateTime(LocalDateTime.now());</span>
+<span class="fc" id="L272">        adminOrderRepository.updateById(order);</span>
+
+<span class="fc" id="L274">        log.info(&quot;订单完成，ID: {}&quot;, id);</span>
+<span class="fc" id="L275">    }</span>
+
+    @Override
+    @Transactional
+    public void refundOrder(Long id) {
+<span class="fc" id="L280">        Order order = adminOrderRepository.selectById(id);</span>
+<span class="pc bpc" id="L281" title="1 of 2 branches missed.">        if (order == null) {</span>
+<span class="nc" id="L282">            throw new RuntimeException(&quot;订单不存在&quot;);</span>
+        }
+
+<span class="pc bpc" id="L285" title="1 of 2 branches missed.">        if (order.getStatus() == OrderStatusEnum.CANCELLED.getCode()) {</span>
+<span class="nc" id="L286">            throw new RuntimeException(&quot;订单已取消&quot;);</span>
+        }
+
+<span class="pc bpc" id="L289" title="1 of 2 branches missed.">        if (order.getStatus() == OrderStatusEnum.REFUNDED.getCode()) {</span>
+<span class="nc" id="L290">            throw new RuntimeException(&quot;订单已退款&quot;);</span>
+        }
+
+        // 恢复商品库存（如果订单不是已取消状态）
+<span class="pc bpc" id="L294" title="1 of 2 branches missed.">        if (order.getStatus() != OrderStatusEnum.CANCELLED.getCode()) {</span>
+<span class="fc" id="L295">            Product product = productRepository.selectById(order.getProductId());</span>
+<span class="pc bpc" id="L296" title="1 of 2 branches missed.">            if (product != null) {</span>
+<span class="fc" id="L297">                product.setStock(product.getStock() + order.getQuantity());</span>
+<span class="fc" id="L298">                productRepository.updateById(product);</span>
+            }
+        }
+
+        // 更新订单状态
+<span class="fc" id="L303">        order.setStatus(OrderStatusEnum.REFUNDED.getCode());</span>
+<span class="fc" id="L304">        order.setUpdateTime(LocalDateTime.now());</span>
+<span class="fc" id="L305">        adminOrderRepository.updateById(order);</span>
+
+<span class="fc" id="L307">        log.info(&quot;订单退款成功，ID: {}&quot;, id);</span>
+<span class="fc" id="L308">    }</span>
+
+    @Override
+    @Transactional
+    public void deleteOrder(Long id) {
+<span class="fc" id="L313">        Order order = adminOrderRepository.selectById(id);</span>
+<span class="pc bpc" id="L314" title="1 of 2 branches missed.">        if (order == null) {</span>
+<span class="nc" id="L315">            throw new RuntimeException(&quot;订单不存在&quot;);</span>
+        }
+
+<span class="fc" id="L318">        adminOrderRepository.deleteById(id);</span>
+<span class="fc" id="L319">        log.info(&quot;订单删除成功，ID: {}&quot;, id);</span>
+<span class="fc" id="L320">    }</span>
+
+    @Override
+    public List&lt;Order&gt; getAllOrders() {
+<span class="fc" id="L324">        return adminOrderRepository.selectList(null);</span>
+    }
+
+    @Override
+    public Map&lt;String, Object&gt; getOrderStatistics() {
+<span class="nc" id="L329">        Map&lt;String, Object&gt; statistics = new HashMap&lt;&gt;();</span>
+        
+        // 总订单数
+<span class="nc" id="L332">        Long totalOrders = adminOrderRepository.selectCount(null);</span>
+<span class="nc" id="L333">        statistics.put(&quot;totalOrders&quot;, totalOrders);</span>
+        
+        // 各状态订单数
+<span class="nc" id="L336">        Map&lt;String, Long&gt; statusCount = new HashMap&lt;&gt;();</span>
+<span class="nc bnc" id="L337" title="All 2 branches missed.">        for (OrderStatusEnum status : OrderStatusEnum.values()) {</span>
+<span class="nc" id="L338">            Long count = adminOrderRepository.selectCount(</span>
+<span class="nc" id="L339">                new LambdaQueryWrapper&lt;Order&gt;().eq(Order::getStatus, status.getCode())</span>
+            );
+<span class="nc" id="L341">            statusCount.put(status.name().toLowerCase(), count);</span>
+        }
+<span class="nc" id="L343">        statistics.put(&quot;statusCount&quot;, statusCount);</span>
+        
+        // 今日订单数
+<span class="nc" id="L346">        LocalDateTime todayStart = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);</span>
+<span class="nc" id="L347">        Long todayOrders = adminOrderRepository.selectCount(</span>
+<span class="nc" id="L348">            new LambdaQueryWrapper&lt;Order&gt;().ge(Order::getCreateTime, todayStart)</span>
+        );
+<span class="nc" id="L350">        statistics.put(&quot;todayOrders&quot;, todayOrders);</span>
+        
+        // 本月订单数
+<span class="nc" id="L353">        LocalDateTime monthStart = LocalDateTime.now().withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);</span>
+<span class="nc" id="L354">        Long monthOrders = adminOrderRepository.selectCount(</span>
+<span class="nc" id="L355">            new LambdaQueryWrapper&lt;Order&gt;().ge(Order::getCreateTime, monthStart)</span>
+        );
+<span class="nc" id="L357">        statistics.put(&quot;monthOrders&quot;, monthOrders);</span>
+        
+        // 总销售额（已完成订单）
+        // 使用MyBatis Plus的查询方法替代自定义方法
+<span class="nc" id="L361">        BigDecimal totalSales = adminOrderRepository.selectObjs(</span>
+            new LambdaQueryWrapper&lt;Order&gt;()
+<span class="nc" id="L363">                .eq(Order::getStatus, OrderStatusEnum.COMPLETED.getCode())</span>
+<span class="nc" id="L364">                .select(Order::getTotalAmount)</span>
+<span class="nc" id="L365">        ).stream()</span>
+<span class="nc" id="L366">        .map(obj -&gt; (BigDecimal) obj)</span>
+<span class="nc" id="L367">        .reduce(BigDecimal.ZERO, BigDecimal::add);</span>
+<span class="nc" id="L368">        statistics.put(&quot;totalSales&quot;, totalSales);</span>
+        
+<span class="nc" id="L370">        log.info(&quot;获取订单统计完成&quot;);</span>
+<span class="nc" id="L371">        return statistics;</span>
+    }
+
+    /**
+     * 生成订单号
+     */
+    private String generateOrderNo() {
+<span class="nc" id="L378">        return &quot;ORD&quot; + System.currentTimeMillis();</span>
+    }
+
+    /**
+     * 转换为VO对象（使用统一的OrderStatusEnum）
+     */
+    private OrderVO convertToVO(Order order) {
+<span class="nc" id="L385">        OrderVO vo = new OrderVO();</span>
+<span class="nc" id="L386">        vo.setId(order.getId());</span>
+<span class="nc" id="L387">        vo.setUserId(order.getUserId());</span>
+<span class="nc" id="L388">        vo.setTotalPrice(order.getTotalAmount());</span>
+<span class="nc" id="L389">        vo.setStatus(order.getStatus());</span>
+<span class="nc" id="L390">        vo.setCreateTime(order.getCreateTime());</span>
+<span class="nc" id="L391">        vo.setUpdateTime(order.getUpdateTime());</span>
+<span class="nc" id="L392">        vo.setStatusText(OrderStatusEnum.getDescByCode(order.getStatus()));</span>
+<span class="nc" id="L393">        return vo;</span>
+    }
+
+    /**
+     * 转换为详情VO对象
+     */
+    private OrderDetailVO convertToDetailVO(Order order) {
+<span class="fc" id="L400">        OrderDetailVO vo = new OrderDetailVO();</span>
+<span class="fc" id="L401">        vo.setId(order.getId());</span>
+<span class="fc" id="L402">        vo.setOrderId(order.getId()); // 设置orderId为订单ID</span>
+<span class="fc" id="L403">        vo.setProductId(order.getProductId());</span>
+<span class="fc" id="L404">        vo.setQuantity(order.getQuantity());</span>
+<span class="fc" id="L405">        vo.setPrice(order.getProductPrice()); // 商品单价</span>
+<span class="fc" id="L406">        vo.setSubtotal(order.getTotalAmount()); // 小计金额</span>
+        
+        // 获取商品信息
+<span class="fc" id="L409">        Product product = productRepository.selectById(order.getProductId());</span>
+<span class="pc bpc" id="L410" title="1 of 2 branches missed.">        if (product != null) {</span>
+<span class="fc" id="L411">            vo.setProductName(product.getName());</span>
+            // 商品图片字段可能不存在，暂时注释
+            // vo.setProductImage(product.getImage());
+        }
+        
+<span class="fc" id="L416">        return vo;</span>
+    }
+
+    // ==================== 新增方法（重构：从Controller移至Service层） ====================
+
+    @Override
+    public AdminOrderDetailVO getAdminOrderDetail(Long id) {
+<span class="fc" id="L423">        Order order = adminOrderRepository.selectById(id);</span>
+<span class="pc bpc" id="L424" title="1 of 2 branches missed.">        if (order == null) {</span>
+<span class="nc" id="L425">            throw new RuntimeException(&quot;订单不存在&quot;);</span>
+        }
+<span class="fc" id="L427">        return AdminOrderDetailVO.fromOrder(order);</span>
+    }
+
+    @Override
+    public List&lt;Order&gt; searchOrders(String orderNo, Long userId) {
+<span class="pc bpc" id="L432" title="1 of 2 branches missed.">        LambdaQueryWrapper&lt;Order&gt; queryWrapper = new LambdaQueryWrapper&lt;Order&gt;()</span>
+<span class="pc bpc" id="L433" title="2 of 4 branches missed.">                .like(orderNo != null &amp;&amp; !orderNo.isEmpty(), Order::getOrderNo, orderNo)</span>
+<span class="fc" id="L434">                .eq(userId != null, Order::getUserId, userId)</span>
+<span class="fc" id="L435">                .orderByDesc(Order::getCreateTime);</span>
+<span class="fc" id="L436">        return adminOrderRepository.selectList(queryWrapper);</span>
+    }
+
+    @Override
+    @Transactional
+    public Order adminUpdateOrder(Long id, Map&lt;String, Object&gt; updateData) {
+<span class="fc" id="L442">        Order order = adminOrderRepository.selectById(id);</span>
+<span class="fc bfc" id="L443" title="All 2 branches covered.">        if (order == null) {</span>
+<span class="fc" id="L444">            throw new RuntimeException(&quot;订单不存在&quot;);</span>
+        }
+
+        // 更新订单基本信息
+<span class="fc bfc" id="L448" title="All 2 branches covered.">        if (updateData.containsKey(&quot;orderNo&quot;)) {</span>
+<span class="fc" id="L449">            order.setOrderNo((String) updateData.get(&quot;orderNo&quot;));</span>
+        }
+<span class="fc bfc" id="L451" title="All 2 branches covered.">        if (updateData.containsKey(&quot;receiverName&quot;)) {</span>
+<span class="fc" id="L452">            order.setReceiverName((String) updateData.get(&quot;receiverName&quot;));</span>
+        }
+<span class="fc bfc" id="L454" title="All 2 branches covered.">        if (updateData.containsKey(&quot;phone&quot;)) {</span>
+<span class="fc" id="L455">            order.setPhone((String) updateData.get(&quot;phone&quot;));</span>
+        }
+<span class="fc bfc" id="L457" title="All 2 branches covered.">        if (updateData.containsKey(&quot;address&quot;)) {</span>
+<span class="fc" id="L458">            order.setAddress((String) updateData.get(&quot;address&quot;));</span>
+        }
+
+        // 处理金额字段
+<span class="pc bpc" id="L462" title="1 of 2 branches missed.">        if (updateData.containsKey(&quot;payAmount&quot;)) {</span>
+<span class="nc" id="L463">            Object val = updateData.get(&quot;payAmount&quot;);</span>
+<span class="nc bnc" id="L464" title="All 2 branches missed.">            order.setPayAmount(val instanceof Number ? </span>
+<span class="nc" id="L465">                BigDecimal.valueOf(((Number) val).doubleValue()) : new BigDecimal(val.toString()));</span>
+        }
+<span class="pc bpc" id="L467" title="1 of 2 branches missed.">        if (updateData.containsKey(&quot;totalAmount&quot;)) {</span>
+<span class="nc" id="L468">            Object val = updateData.get(&quot;totalAmount&quot;);</span>
+<span class="nc bnc" id="L469" title="All 2 branches missed.">            order.setTotalAmount(val instanceof Number ? </span>
+<span class="nc" id="L470">                BigDecimal.valueOf(((Number) val).doubleValue()) : new BigDecimal(val.toString()));</span>
+        }
+
+        // 处理支付方式
+<span class="pc bpc" id="L474" title="1 of 2 branches missed.">        if (updateData.containsKey(&quot;payMethod&quot;)) {</span>
+<span class="nc" id="L475">            Object val = updateData.get(&quot;payMethod&quot;);</span>
+<span class="nc bnc" id="L476" title="All 2 branches missed.">            if (val instanceof Number) order.setPayMethod(((Number) val).intValue());</span>
+<span class="nc bnc" id="L477" title="All 2 branches missed.">            else if (val instanceof String) {</span>
+<span class="nc" id="L478">                try { order.setPayMethod(Integer.parseInt((String) val)); } </span>
+<span class="nc" id="L479">                catch (NumberFormatException e) { log.warn(&quot;支付方式转换失败: {}&quot;, val); }</span>
+            }
+        }
+
+        // 处理支付时间
+<span class="pc bpc" id="L484" title="1 of 2 branches missed.">        if (updateData.containsKey(&quot;payTime&quot;)) {</span>
+<span class="nc" id="L485">            Object val = updateData.get(&quot;payTime&quot;);</span>
+<span class="nc bnc" id="L486" title="All 2 branches missed.">            if (val instanceof String) {</span>
+<span class="nc" id="L487">                try { order.setPayTime(LocalDateTime.parse((String) val, DateTimeFormatter.ISO_LOCAL_DATE_TIME)); } </span>
+<span class="nc" id="L488">                catch (DateTimeParseException e) { log.warn(&quot;支付时间转换失败: {}&quot;, val); }</span>
+            }
+        }
+
+        // 更新订单状态
+<span class="fc bfc" id="L493" title="All 2 branches covered.">        if (updateData.containsKey(&quot;status&quot;)) {</span>
+<span class="fc" id="L494">            Integer status = OrderStatusEnum.resolveCode(updateData.get(&quot;status&quot;).toString());</span>
+<span class="pc bpc" id="L495" title="1 of 2 branches missed.">            if (status != null) order.setStatus(status);</span>
+        }
+
+<span class="fc" id="L498">        order.setUpdateTime(LocalDateTime.now());</span>
+<span class="fc" id="L499">        adminOrderRepository.updateById(order);</span>
+<span class="fc" id="L500">        return adminOrderRepository.selectById(id);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

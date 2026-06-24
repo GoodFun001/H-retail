@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OrderController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">retail-platform</a> &gt; <a href="index.source.html" class="el_package">com.retail.controller</a> &gt; <span class="el_source">OrderController.java</span></div><h1>OrderController.java</h1><pre class="source lang-java linenums">package com.retail.controller;
+
+import com.retail.common.Result;
+import com.retail.entity.Order;
+import com.retail.service.OrderService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.Map;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+
+/**
+ * 订单控制器
+ */
+<span class="nc" id="L22">@Slf4j</span>
+@RestController
+@RequestMapping(&quot;/orders&quot;)
+@Tag(name = &quot;订单管理&quot;, description = &quot;订单创建、查询、管理相关接口&quot;)
+<span class="nc" id="L26">public class OrderController {</span>
+
+    @Autowired
+    private OrderService orderService;
+
+    /**
+     * 创建订单
+     */
+    @PostMapping
+    @Operation(summary = &quot;创建订单&quot;, description = &quot;创建新订单&quot;)
+    public Result&lt;Order&gt; createOrder(@RequestBody Order order,
+                                    HttpServletRequest request) {
+        try {
+            // 调试：打印接收到的订单数据
+<span class="nc" id="L40">            log.info(&quot;接收到的订单数据: {}&quot;, order);</span>
+            
+            // 从请求中获取用户ID（实际项目中应该从JWT token中获取）
+<span class="nc" id="L43">            Long userId = getUserIdFromRequest(request);</span>
+<span class="nc bnc" id="L44" title="All 2 branches missed.">            if (userId == null) {</span>
+<span class="nc" id="L45">                return Result.unauthorized(&quot;用户未登录&quot;);</span>
+            }
+<span class="nc" id="L47">            order.setUserId(userId);</span>
+
+<span class="nc" id="L49">            Order createdOrder = orderService.createOrder(order);</span>
+<span class="nc" id="L50">            return Result.success(createdOrder);</span>
+<span class="nc" id="L51">        } catch (Exception e) {</span>
+<span class="nc" id="L52">            log.error(&quot;创建订单失败: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L53">            return Result.error(&quot;创建订单失败: &quot; + e.getMessage());</span>
+        }
+    }
+
+    /**
+     * 获取用户订单列表
+     */
+    @GetMapping
+    @Operation(summary = &quot;获取用户订单列表&quot;, description = &quot;获取当前用户的订单列表&quot;)
+    public Result&lt;List&lt;Order&gt;&gt; getUserOrders(HttpServletRequest request) {
+        try {
+<span class="nc" id="L64">            Long userId = getUserIdFromRequest(request);</span>
+<span class="nc bnc" id="L65" title="All 2 branches missed.">            if (userId == null) {</span>
+<span class="nc" id="L66">                return Result.unauthorized(&quot;用户未登录&quot;);</span>
+            }
+
+<span class="nc" id="L69">            List&lt;Order&gt; orders = orderService.getOrdersByUserId(userId);</span>
+<span class="nc" id="L70">            return Result.success(orders);</span>
+<span class="nc" id="L71">        } catch (Exception e) {</span>
+<span class="nc" id="L72">            log.error(&quot;获取订单列表失败: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L73">            return Result.error(&quot;获取订单列表失败&quot;);</span>
+        }
+    }
+
+    /**
+     * 获取订单详情
+     */
+    @GetMapping(&quot;/{id}&quot;)
+    @Operation(summary = &quot;获取订单详情&quot;, description = &quot;根据订单ID获取订单详细信息&quot;)
+    public Result&lt;Order&gt; getOrderById(
+            @Parameter(description = &quot;订单ID&quot;, required = true) @PathVariable Long id,
+            HttpServletRequest request) {
+        try {
+<span class="nc" id="L86">            Long userId = getUserIdFromRequest(request);</span>
+<span class="nc bnc" id="L87" title="All 2 branches missed.">            if (userId == null) {</span>
+<span class="nc" id="L88">                return Result.unauthorized(&quot;用户未登录&quot;);</span>
+            }
+
+<span class="nc" id="L91">            Order order = orderService.getOrderById(id);</span>
+<span class="nc bnc" id="L92" title="All 2 branches missed.">            if (order != null) {</span>
+<span class="nc" id="L93">                return Result.success(order);</span>
+            } else {
+<span class="nc" id="L95">                return Result.error(&quot;订单不存在&quot;);</span>
+            }
+<span class="nc" id="L97">        } catch (Exception e) {</span>
+<span class="nc" id="L98">            log.error(&quot;获取订单详情失败: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L99">            return Result.error(&quot;获取订单详情失败&quot;);</span>
+        }
+    }
+
+    /**
+     * 取消订单
+     */
+    @PutMapping(&quot;/{id}/cancel&quot;)
+    @Operation(summary = &quot;取消订单&quot;, description = &quot;取消指定的订单&quot;)
+    public Result&lt;String&gt; cancelOrder(
+            @Parameter(description = &quot;订单ID&quot;, required = true) @PathVariable Long id,
+            HttpServletRequest request) {
+        try {
+<span class="nc" id="L112">            Long userId = getUserIdFromRequest(request);</span>
+<span class="nc bnc" id="L113" title="All 2 branches missed.">            if (userId == null) {</span>
+<span class="nc" id="L114">                return Result.unauthorized(&quot;用户未登录&quot;);</span>
+            }
+
+<span class="nc" id="L117">            boolean success = orderService.cancelOrder(id);</span>
+<span class="nc bnc" id="L118" title="All 2 branches missed.">            if (success) {</span>
+<span class="nc" id="L119">                return Result.success(&quot;订单已取消&quot;);</span>
+            } else {
+<span class="nc" id="L121">                return Result.error(&quot;取消订单失败&quot;);</span>
+            }
+<span class="nc" id="L123">        } catch (Exception e) {</span>
+<span class="nc" id="L124">            log.error(&quot;取消订单失败: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L125">            return Result.error(&quot;取消订单失败&quot;);</span>
+        }
+    }
+
+    /**
+     * 确认收货
+     */
+    @PutMapping(&quot;/{id}/confirm&quot;)
+    @Operation(summary = &quot;确认收货&quot;, description = &quot;确认收货，完成订单&quot;)
+    public Result&lt;String&gt; confirmOrder(
+            @Parameter(description = &quot;订单ID&quot;, required = true) @PathVariable Long id,
+            HttpServletRequest request) {
+        try {
+<span class="nc" id="L138">            Long userId = getUserIdFromRequest(request);</span>
+<span class="nc bnc" id="L139" title="All 2 branches missed.">            if (userId == null) {</span>
+<span class="nc" id="L140">                return Result.unauthorized(&quot;用户未登录&quot;);</span>
+            }
+
+            // 调用updateOrderStatus方法将订单状态更新为&quot;已完成&quot;（假设状态码3表示已完成）
+<span class="nc" id="L144">            boolean success = orderService.updateOrderStatus(id, 3);</span>
+<span class="nc bnc" id="L145" title="All 2 branches missed.">            if (success) {</span>
+<span class="nc" id="L146">                return Result.success(&quot;确认收货成功&quot;);</span>
+            } else {
+<span class="nc" id="L148">                return Result.error(&quot;确认收货失败&quot;);</span>
+            }
+<span class="nc" id="L150">        } catch (Exception e) {</span>
+<span class="nc" id="L151">            log.error(&quot;确认收货失败: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L152">            return Result.error(&quot;确认收货失败&quot;);</span>
+        }
+    }
+
+    /**
+     * 获取订单统计
+     */
+    @GetMapping(&quot;/statistics&quot;)
+    @Operation(summary = &quot;获取订单统计&quot;, description = &quot;获取用户订单统计信息&quot;)
+    public Result&lt;Map&lt;String, Object&gt;&gt; getOrderStatistics(HttpServletRequest request) {
+        try {
+<span class="nc" id="L163">            Long userId = getUserIdFromRequest(request);</span>
+<span class="nc bnc" id="L164" title="All 2 branches missed.">            if (userId == null) {</span>
+<span class="nc" id="L165">                return Result.unauthorized(&quot;用户未登录&quot;);</span>
+            }
+
+            // 暂时返回空的统计信息，实际功能需要在OrderService中实现
+<span class="nc" id="L169">            Map&lt;String, Object&gt; statistics = new java.util.HashMap&lt;&gt;();</span>
+<span class="nc" id="L170">            return Result.success(statistics);</span>
+<span class="nc" id="L171">        } catch (Exception e) {</span>
+<span class="nc" id="L172">            log.error(&quot;获取订单统计失败: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L173">            return Result.error(&quot;获取订单统计失败&quot;);</span>
+        }
+    }
+
+    /**
+     * 从SecurityContext中获取用户ID
+     */
+    private Long getUserIdFromRequest(HttpServletRequest request) {
+        try {
+<span class="nc" id="L182">            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();</span>
+<span class="nc bnc" id="L183" title="All 4 branches missed.">            if (authentication != null &amp;&amp; authentication.getPrincipal() != null) {</span>
+<span class="nc" id="L184">                Object principal = authentication.getPrincipal();</span>
+                
+                // 处理User实体对象情况
+<span class="nc bnc" id="L187" title="All 2 branches missed.">                if (principal instanceof com.retail.entity.User) {</span>
+<span class="nc" id="L188">                    com.retail.entity.User user = (com.retail.entity.User) principal;</span>
+<span class="nc" id="L189">                    return user.getId();</span>
+                }
+                
+                // 保留对Map类型的支持（兼容旧版本）
+<span class="nc bnc" id="L193" title="All 2 branches missed.">                if (principal instanceof Map) {</span>
+<span class="nc" id="L194">                    Map&lt;String, Object&gt; userInfo = (Map&lt;String, Object&gt;) principal;</span>
+<span class="nc" id="L195">                    Number userIdNum = (Number) userInfo.get(&quot;id&quot;);</span>
+<span class="nc bnc" id="L196" title="All 2 branches missed.">                    if (userIdNum != null) {</span>
+<span class="nc" id="L197">                        return userIdNum.longValue();</span>
+                    }
+                }
+            }
+<span class="nc" id="L201">        } catch (Exception e) {</span>
+<span class="nc" id="L202">            log.error(&quot;获取用户ID失败: {}&quot;, e.getMessage());</span>
+<span class="nc" id="L203">        }</span>
+<span class="nc" id="L204">        return null;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

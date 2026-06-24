@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProductRepository.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">retail-platform</a> &gt; <a href="index.source.html" class="el_package">com.retail.repository</a> &gt; <span class="el_source">ProductRepository.java</span></div><h1>ProductRepository.java</h1><pre class="source lang-java linenums">package com.retail.repository;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.retail.entity.Product;
+import com.retail.mapper.ProductMapper;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+/**
+ * 商品Repository层
+ * 封装ProductMapper的数据访问操作，提供业务语义化的数据查询方法
+ */
+<span class="fc" id="L18">@Slf4j</span>
+@Repository
+<span class="nc" id="L20">@RequiredArgsConstructor</span>
+public class ProductRepository {
+
+    private final ProductMapper productMapper;
+
+    /**
+     * 根据ID查询商品
+     */
+    public Product findById(Long id) {
+<span class="nc" id="L29">        return productMapper.selectById(id);</span>
+    }
+
+    /**
+     * 根据ID查询商品（别名，兼容旧代码）
+     */
+    public Product selectById(Long id) {
+<span class="nc" id="L36">        return findById(id);</span>
+    }
+
+    /**
+     * 分页查询商品
+     */
+    public IPage&lt;Product&gt; selectPage(Page&lt;Product&gt; page, LambdaQueryWrapper&lt;Product&gt; wrapper) {
+<span class="nc" id="L43">        return productMapper.selectPage(page, wrapper);</span>
+    }
+
+    /**
+     * 条件查询商品列表
+     */
+    public List&lt;Product&gt; selectList(LambdaQueryWrapper&lt;Product&gt; wrapper) {
+<span class="nc" id="L50">        return productMapper.selectList(wrapper);</span>
+    }
+
+    /**
+     * 直接查询商品列表（绕过逻辑删除过滤器）
+     */
+    public List&lt;Product&gt; selectListDirect(LambdaQueryWrapper&lt;Product&gt; wrapper) {
+<span class="nc" id="L57">        return productMapper.selectList(wrapper);</span>
+    }
+
+    /**
+     * 保存商品
+     */
+    public boolean save(Product product) {
+<span class="nc bnc" id="L64" title="All 2 branches missed.">        return productMapper.insert(product) &gt; 0;</span>
+    }
+
+    /**
+     * 保存商品（别名，兼容旧代码）
+     */
+    public int insert(Product product) {
+<span class="nc" id="L71">        return productMapper.insert(product);</span>
+    }
+
+    /**
+     * 更新商品
+     */
+    public boolean update(Product product) {
+<span class="nc bnc" id="L78" title="All 2 branches missed.">        return productMapper.updateById(product) &gt; 0;</span>
+    }
+
+    /**
+     * 更新商品（别名，兼容旧代码）
+     */
+    public int updateById(Product product) {
+<span class="nc" id="L85">        return productMapper.updateById(product);</span>
+    }
+
+    /**
+     * 根据ID删除商品（逻辑删除）
+     */
+    public boolean deleteById(Long id) {
+<span class="nc bnc" id="L92" title="All 2 branches missed.">        return productMapper.deleteById(id) &gt; 0;</span>
+    }
+
+    /**
+     * 查询所有商品
+     */
+    public List&lt;Product&gt; findAll() {
+<span class="nc" id="L99">        return productMapper.selectList(null);</span>
+    }
+
+    /**
+     * 统计商品数量
+     */
+    public Long count() {
+<span class="nc" id="L106">        return productMapper.selectCount(null);</span>
+    }
+
+    /**
+     * 条件统计商品数量
+     */
+    public Long count(LambdaQueryWrapper&lt;Product&gt; wrapper) {
+<span class="nc" id="L113">        return productMapper.selectCount(wrapper);</span>
+    }
+
+    /**
+     * 条件更新商品
+     */
+    public boolean update(LambdaQueryWrapper&lt;Product&gt; wrapper) {
+<span class="nc bnc" id="L120" title="All 2 branches missed.">        return productMapper.update(null, wrapper) &gt; 0;</span>
+    }
+
+    /**
+     * 批量更新（使用MyBatis Plus Service层能力）
+     */
+    public boolean updateBatchById(List&lt;Product&gt; products) {
+<span class="nc bnc" id="L127" title="All 2 branches missed.">        for (Product product : products) {</span>
+<span class="nc bnc" id="L128" title="All 2 branches missed.">            if (productMapper.updateById(product) &lt;= 0) return false;</span>
+<span class="nc" id="L129">        }</span>
+<span class="nc" id="L130">        return true;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserRepository.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">retail-platform</a> &gt; <a href="index.source.html" class="el_package">com.retail.repository</a> &gt; <span class="el_source">UserRepository.java</span></div><h1>UserRepository.java</h1><pre class="source lang-java linenums">package com.retail.repository;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.retail.entity.User;
+import com.retail.mapper.UserMapper;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+/**
+ * 用户Repository层
+ * 封装UserMapper的数据访问操作，提供业务语义化的数据查询方法
+ */
+<span class="nc" id="L18">@Slf4j</span>
+@Repository
+<span class="nc" id="L20">@RequiredArgsConstructor</span>
+public class UserRepository {
+
+    private final UserMapper userMapper;
+
+    /**
+     * 根据ID查询用户
+     */
+    public User findById(Long id) {
+<span class="nc" id="L29">        return userMapper.selectById(id);</span>
+    }
+
+    /**
+     * 根据ID查询用户（别名，兼容旧代码）
+     */
+    public User selectById(Long id) {
+<span class="nc" id="L36">        return findById(id);</span>
+    }
+
+    /**
+     * 根据用户名查询用户（未删除）
+     */
+    public User findByUsername(String username) {
+<span class="nc" id="L43">        return userMapper.selectOne(</span>
+            new LambdaQueryWrapper&lt;User&gt;()
+<span class="nc" id="L45">                .eq(User::getUsername, username)</span>
+<span class="nc" id="L46">                .eq(User::getDeleted, 0)</span>
+<span class="nc" id="L47">                .last(&quot;LIMIT 1&quot;)</span>
+        );
+    }
+
+    /**
+     * 根据手机号查询用户（未删除）
+     */
+    public User findByPhone(String phone) {
+<span class="nc" id="L55">        return userMapper.selectOne(</span>
+            new LambdaQueryWrapper&lt;User&gt;()
+<span class="nc" id="L57">                .eq(User::getPhone, phone)</span>
+<span class="nc" id="L58">                .eq(User::getDeleted, 0)</span>
+<span class="nc" id="L59">                .last(&quot;LIMIT 1&quot;)</span>
+        );
+    }
+
+    /**
+     * 保存用户
+     */
+    public boolean save(User user) {
+<span class="nc bnc" id="L67" title="All 2 branches missed.">        return userMapper.insert(user) &gt; 0;</span>
+    }
+
+    /**
+     * 保存用户（别名，兼容旧代码）
+     */
+    public int insert(User user) {
+<span class="nc" id="L74">        return userMapper.insert(user);</span>
+    }
+
+    /**
+     * 更新用户
+     */
+    public boolean update(User user) {
+<span class="nc bnc" id="L81" title="All 2 branches missed.">        return userMapper.updateById(user) &gt; 0;</span>
+    }
+
+    /**
+     * 更新用户（别名，兼容旧代码）
+     */
+    public int updateById(User user) {
+<span class="nc" id="L88">        return userMapper.updateById(user);</span>
+    }
+
+    /**
+     * 根据ID删除用户（逻辑删除）
+     */
+    public boolean deleteById(Long id) {
+<span class="nc bnc" id="L95" title="All 2 branches missed.">        return userMapper.deleteById(id) &gt; 0;</span>
+    }
+
+    /**
+     * 分页查询用户列表
+     */
+    public IPage&lt;User&gt; selectPage(Page&lt;User&gt; page) {
+<span class="nc" id="L102">        return userMapper.selectPage(page, null);</span>
+    }
+
+    /**
+     * 条件查询用户列表
+     */
+    public List&lt;User&gt; selectList(LambdaQueryWrapper&lt;User&gt; wrapper) {
+<span class="nc" id="L109">        return userMapper.selectList(wrapper);</span>
+    }
+
+    /**
+     * 查询所有用户
+     */
+    public List&lt;User&gt; findAll() {
+<span class="nc" id="L116">        return userMapper.selectList(null);</span>
+    }
+
+    /**
+     * 批量更新（使用MyBatis Plus Service层能力）
+     */
+    public boolean updateBatchById(List&lt;User&gt; users) {
+<span class="nc bnc" id="L123" title="All 2 branches missed.">        for (User user : users) {</span>
+<span class="nc bnc" id="L124" title="All 2 branches missed.">            if (userMapper.updateById(user) &lt;= 0) return false;</span>
+<span class="nc" id="L125">        }</span>
+<span class="nc" id="L126">        return true;</span>
+    }
+
+    /**
+     * 条件更新
+     */
+    public int update(LambdaQueryWrapper&lt;User&gt; wrapper) {
+<span class="nc" id="L133">        return userMapper.update(null, wrapper);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

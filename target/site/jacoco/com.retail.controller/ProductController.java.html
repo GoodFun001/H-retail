@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProductController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">retail-platform</a> &gt; <a href="index.source.html" class="el_package">com.retail.controller</a> &gt; <span class="el_source">ProductController.java</span></div><h1>ProductController.java</h1><pre class="source lang-java linenums">package com.retail.controller;
+
+import com.retail.common.Result;
+import com.retail.entity.Product;
+import com.retail.service.ProductService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+
+/**
+ * 商品控制器
+ */
+<span class="nc" id="L19">@Slf4j</span>
+@RestController
+@RequestMapping(&quot;/products&quot;)
+@Tag(name = &quot;商品管理&quot;, description = &quot;商品查询相关接口&quot;)
+<span class="nc" id="L23">public class ProductController {</span>
+
+    @Autowired
+    private ProductService productService;
+
+    /**
+     * 获取商品列表
+     */
+    @GetMapping
+    @Operation(summary = &quot;获取商品列表&quot;, description = &quot;获取所有可用商品列表&quot;)
+    public Result&lt;IPage&lt;Product&gt;&gt; getProductList(
+            @RequestParam(defaultValue = &quot;1&quot;) Integer pageNum,
+            @RequestParam(defaultValue = &quot;10&quot;) Integer pageSize,
+            @RequestParam(required = false) String searchKey,
+            @RequestParam(required = false) Integer category) {
+        try {
+<span class="nc" id="L39">            IPage&lt;Product&gt; products = productService.getProductList(pageNum, pageSize, searchKey, category);</span>
+<span class="nc" id="L40">            return Result.success(products);</span>
+<span class="nc" id="L41">        } catch (Exception e) {</span>
+<span class="nc" id="L42">            log.error(&quot;获取商品列表失败: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L43">            return Result.error(&quot;获取商品列表失败&quot;);</span>
+        }
+    }
+
+    /**
+     * 搜索商品
+     */
+    @GetMapping(&quot;/search&quot;)
+    @Operation(summary = &quot;搜索商品&quot;, description = &quot;根据关键词搜索商品&quot;)
+    public Result&lt;IPage&lt;Product&gt;&gt; searchProducts(
+            @Parameter(description = &quot;搜索关键词&quot;, required = true) @RequestParam String keyword,
+            @RequestParam(defaultValue = &quot;1&quot;) Integer pageNum,
+            @RequestParam(defaultValue = &quot;10&quot;) Integer pageSize) {
+        try {
+<span class="nc" id="L57">            IPage&lt;Product&gt; products = productService.getProductList(pageNum, pageSize, keyword, null);</span>
+<span class="nc" id="L58">            return Result.success(products);</span>
+<span class="nc" id="L59">        } catch (Exception e) {</span>
+<span class="nc" id="L60">            log.error(&quot;搜索商品失败: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L61">            return Result.error(&quot;搜索商品失败&quot;);</span>
+        }
+    }
+
+    /**
+     * 按分类获取商品
+     */
+    @GetMapping(&quot;/category/{category}&quot;)
+    @Operation(summary = &quot;按分类获取商品&quot;, description = &quot;根据商品分类获取商品列表&quot;)
+    public Result&lt;IPage&lt;Product&gt;&gt; getProductsByCategory(
+            @Parameter(description = &quot;商品分类&quot;, required = true) @PathVariable Integer category,
+            @RequestParam(defaultValue = &quot;1&quot;) Integer pageNum,
+            @RequestParam(defaultValue = &quot;10&quot;) Integer pageSize) {
+        try {
+<span class="nc" id="L75">            IPage&lt;Product&gt; products = productService.getProductList(pageNum, pageSize, null, category);</span>
+<span class="nc" id="L76">            return Result.success(products);</span>
+<span class="nc" id="L77">        } catch (Exception e) {</span>
+<span class="nc" id="L78">            log.error(&quot;按分类获取商品失败: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L79">            return Result.error(&quot;按分类获取商品失败&quot;);</span>
+        }
+    }
+
+    /**
+     * 获取商品分类列表
+     */
+    @GetMapping(&quot;/categories&quot;)
+    @Operation(summary = &quot;获取商品分类列表&quot;, description = &quot;获取所有商品分类&quot;)
+    public Result&lt;List&lt;CategoryVO&gt;&gt; getProductCategories() {
+        try {
+            // 获取所有商品，提取唯一的分类值
+<span class="nc" id="L91">            IPage&lt;Product&gt; allProducts = productService.getProductList(1, 1000, null, null);</span>
+<span class="nc" id="L92">            List&lt;CategoryVO&gt; categories = allProducts.getRecords().stream()</span>
+<span class="nc" id="L93">                    .map(Product::getCategory)</span>
+<span class="nc" id="L94">                    .distinct()</span>
+<span class="nc" id="L95">                    .sorted()</span>
+<span class="nc" id="L96">                    .map(category -&gt; {</span>
+<span class="nc" id="L97">                        CategoryVO categoryVO = new CategoryVO();</span>
+<span class="nc" id="L98">                        categoryVO.setId(category);</span>
+                        // 根据分类ID获取对应的分类名称
+<span class="nc" id="L100">                        categoryVO.setName(getCategoryName(category));</span>
+<span class="nc" id="L101">                        return categoryVO;</span>
+                    })
+<span class="nc" id="L103">                    .toList();</span>
+<span class="nc" id="L104">            return Result.success(categories);</span>
+<span class="nc" id="L105">        } catch (Exception e) {</span>
+<span class="nc" id="L106">            log.error(&quot;获取商品分类列表失败: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L107">            return Result.error(&quot;获取商品分类列表失败&quot;);</span>
+        }
+    }
+    
+    /**
+     * 根据分类ID获取分类名称
+     */
+    private String getCategoryName(Integer categoryId) {
+<span class="nc bnc" id="L115" title="All 6 branches missed.">        switch (categoryId) {</span>
+<span class="nc" id="L116">            case 1: return &quot;手机数码&quot;;</span>
+<span class="nc" id="L117">            case 2: return &quot;电脑办公&quot;;</span>
+<span class="nc" id="L118">            case 3: return &quot;家用电器&quot;;</span>
+<span class="nc" id="L119">            case 4: return &quot;服装鞋包&quot;;</span>
+<span class="nc" id="L120">            case 5: return &quot;图书音像&quot;;</span>
+<span class="nc" id="L121">            default: return &quot;其他&quot;;</span>
+        }
+    }
+    
+    /**
+     * 分类VO类
+     */
+    private static class CategoryVO {
+        private Integer id;
+        private String name;
+        
+        public Integer getId() {
+<span class="nc" id="L133">            return id;</span>
+        }
+        
+        public void setId(Integer id) {
+<span class="nc" id="L137">            this.id = id;</span>
+<span class="nc" id="L138">        }</span>
+        
+        public String getName() {
+<span class="nc" id="L141">            return name;</span>
+        }
+        
+        public void setName(String name) {
+<span class="nc" id="L145">            this.name = name;</span>
+<span class="nc" id="L146">        }</span>
+    }
+
+    /**
+     * 根据ID获取商品详情
+     */
+    @GetMapping(&quot;/{id}&quot;)
+    @Operation(summary = &quot;获取商品详情&quot;, description = &quot;根据商品ID获取商品详细信息&quot;)
+    public Result&lt;Product&gt; getProductById(
+            @Parameter(description = &quot;商品ID&quot;, required = true) @PathVariable Long id) {
+        try {
+<span class="nc" id="L157">            Product product = productService.getProductDetail(id);</span>
+<span class="nc bnc" id="L158" title="All 2 branches missed.">            if (product != null) {</span>
+<span class="nc" id="L159">                return Result.success(product);</span>
+            } else {
+<span class="nc" id="L161">                return Result.error(&quot;商品不存在&quot;);</span>
+            }
+<span class="nc" id="L163">        } catch (Exception e) {</span>
+<span class="nc" id="L164">            log.error(&quot;获取商品详情失败: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L165">            return Result.error(&quot;获取商品详情失败&quot;);</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

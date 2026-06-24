@@ -1,0 +1,606 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AdminProductServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">retail-platform</a> &gt; <a href="index.source.html" class="el_package">com.retail.service.impl</a> &gt; <span class="el_source">AdminProductServiceImpl.java</span></div><h1>AdminProductServiceImpl.java</h1><pre class="source lang-java linenums">package com.retail.service.impl;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageImpl;
+import com.retail.dto.ProductCreateDTO;
+import com.retail.dto.ProductDTO;
+import com.retail.dto.ProductUpdateDTO;
+import com.retail.entity.Product;
+import com.retail.repository.AdminProductRepository;
+import com.retail.service.AdminProductService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+/**
+ * 管理员产品服务实现类
+ * 【重构说明】引入Repository层，Service通过AdminProductRepository访问数据，
+ * 不再直接依赖AdminProductMapper，符合分层架构原则。
+ */
+<span class="nc" id="L35">@Slf4j</span>
+@Service
+<span class="nc" id="L37">@RequiredArgsConstructor</span>
+public class AdminProductServiceImpl implements AdminProductService {
+
+    private final AdminProductRepository adminProductRepository;
+
+    /** 低库存阈值 - 可配置化（原硬编码为10） */
+    private static final int LOW_STOCK_THRESHOLD = 10;
+
+    @Override
+    public org.springframework.data.domain.Page&lt;ProductDTO&gt; getAllProducts(Pageable pageable) {
+<span class="nc" id="L47">        log.info(&quot;获取所有产品列表，页码: {}, 每页大小: {}&quot;, pageable.getPageNumber(), pageable.getPageSize());</span>
+        
+        // 转换为MyBatis-Plus的Page对象
+<span class="nc" id="L50">        Page&lt;Product&gt; page = </span>
+            new Page&lt;&gt;(
+<span class="nc" id="L52">                pageable.getPageNumber() + 1, // MyBatis-Plus页码从1开始</span>
+<span class="nc" id="L53">                pageable.getPageSize()</span>
+            );
+        
+<span class="nc" id="L56">        Page&lt;Product&gt; productPage = adminProductRepository.selectPage(page, null);</span>
+        
+        // 转换为DTO
+<span class="nc" id="L59">        List&lt;ProductDTO&gt; productDTOs = productPage.getRecords().stream()</span>
+<span class="nc" id="L60">            .map(this::convertToDTO)</span>
+<span class="nc" id="L61">            .collect(Collectors.toList());</span>
+        
+        // 转换为Spring Data的Page对象
+<span class="nc" id="L64">        org.springframework.data.domain.Page&lt;ProductDTO&gt; result = new PageImpl&lt;&gt;(productDTOs, pageable, productPage.getTotal());</span>
+        
+<span class="nc" id="L66">        log.info(&quot;获取产品列表成功，总数: {}&quot;, productPage.getTotal());</span>
+<span class="nc" id="L67">        return result;</span>
+    }
+
+    @Override
+    public ProductDTO getProductById(Long id) {
+<span class="nc" id="L72">        log.info(&quot;根据ID获取产品: {}&quot;, id);</span>
+        
+<span class="nc" id="L74">        Product product = adminProductRepository.selectById(id);</span>
+<span class="nc bnc" id="L75" title="All 2 branches missed.">        if (product == null) {</span>
+<span class="nc" id="L76">            log.warn(&quot;产品不存在: {}&quot;, id);</span>
+<span class="nc" id="L77">            return null;</span>
+        }
+        
+<span class="nc" id="L80">        ProductDTO productDTO = convertToDTO(product);</span>
+<span class="nc" id="L81">        log.info(&quot;获取产品成功: {}&quot;, product.getName());</span>
+<span class="nc" id="L82">        return productDTO;</span>
+    }
+
+    @Override
+    @Transactional
+    public ProductDTO createProduct(ProductCreateDTO productCreateDTO) {
+<span class="nc" id="L88">        log.info(&quot;创建产品: {}&quot;, productCreateDTO.getName());</span>
+        
+        // 检查产品名称是否已存在
+<span class="nc bnc" id="L91" title="All 2 branches missed.">        if (existsByName(productCreateDTO.getName(), null)) {</span>
+<span class="nc" id="L92">            throw new RuntimeException(&quot;产品名称已存在: &quot; + productCreateDTO.getName());</span>
+        }
+        
+        // 检查产品编码是否已存在
+<span class="nc bnc" id="L96" title="All 2 branches missed.">        if (StringUtils.hasText(productCreateDTO.getCode()) &amp;&amp; </span>
+<span class="nc bnc" id="L97" title="All 2 branches missed.">            existsByCode(productCreateDTO.getCode(), null)) {</span>
+<span class="nc" id="L98">            throw new RuntimeException(&quot;产品编码已存在: &quot; + productCreateDTO.getCode());</span>
+        }
+        
+<span class="nc" id="L101">        Product product = new Product();</span>
+<span class="nc" id="L102">        BeanUtils.copyProperties(productCreateDTO, product);</span>
+<span class="nc" id="L103">        product.setStatus(1); // 默认状态为上架</span>
+        
+        // 设置默认值
+<span class="nc bnc" id="L106" title="All 2 branches missed.">        if (product.getSales() == null) {</span>
+<span class="nc" id="L107">            product.setSales(0);</span>
+        }
+        
+<span class="nc" id="L110">        adminProductRepository.insert(product);</span>
+        
+<span class="nc" id="L112">        ProductDTO productDTO = convertToDTO(product);</span>
+<span class="nc" id="L113">        log.info(&quot;创建产品成功: {}&quot;, product.getName());</span>
+<span class="nc" id="L114">        return productDTO;</span>
+    }
+
+    @Override
+    @Transactional
+    public ProductDTO updateProduct(Long id, ProductUpdateDTO productUpdateDTO) {
+<span class="nc" id="L120">        log.info(&quot;更新产品: {}&quot;, id);</span>
+        
+<span class="nc" id="L122">        Product existingProduct = adminProductRepository.selectById(id);</span>
+<span class="nc bnc" id="L123" title="All 2 branches missed.">        if (existingProduct == null) {</span>
+<span class="nc" id="L124">            throw new RuntimeException(&quot;产品不存在: &quot; + id);</span>
+        }
+        
+        // 检查产品名称是否已存在（排除当前产品）
+<span class="nc bnc" id="L128" title="All 2 branches missed.">        if (StringUtils.hasText(productUpdateDTO.getName()) &amp;&amp; </span>
+<span class="nc bnc" id="L129" title="All 2 branches missed.">            existsByName(productUpdateDTO.getName(), id)) {</span>
+<span class="nc" id="L130">            throw new RuntimeException(&quot;产品名称已存在: &quot; + productUpdateDTO.getName());</span>
+        }
+        
+        // 检查产品编码是否已存在（排除当前产品）
+<span class="nc bnc" id="L134" title="All 2 branches missed.">        if (StringUtils.hasText(productUpdateDTO.getCode()) &amp;&amp; </span>
+<span class="nc bnc" id="L135" title="All 2 branches missed.">            existsByCode(productUpdateDTO.getCode(), id)) {</span>
+<span class="nc" id="L136">            throw new RuntimeException(&quot;产品编码已存在: &quot; + productUpdateDTO.getCode());</span>
+        }
+        
+<span class="nc" id="L139">        BeanUtils.copyProperties(productUpdateDTO, existingProduct, &quot;id&quot;, &quot;createTime&quot;);</span>
+        
+<span class="nc" id="L141">        adminProductRepository.updateById(existingProduct);</span>
+        
+<span class="nc" id="L143">        ProductDTO productDTO = convertToDTO(existingProduct);</span>
+<span class="nc" id="L144">        log.info(&quot;更新产品成功: {}&quot;, existingProduct.getName());</span>
+<span class="nc" id="L145">        return productDTO;</span>
+    }
+
+    @Override
+    @Transactional
+    public boolean deleteProduct(Long id) {
+<span class="nc" id="L151">        log.info(&quot;删除产品: {}&quot;, id);</span>
+        
+<span class="nc" id="L153">        Product product = adminProductRepository.selectById(id);</span>
+<span class="nc bnc" id="L154" title="All 2 branches missed.">        if (product == null) {</span>
+<span class="nc" id="L155">            log.warn(&quot;删除产品失败，产品不存在: {}&quot;, id);</span>
+<span class="nc" id="L156">            return false;</span>
+        }
+        
+<span class="nc" id="L159">        int result = adminProductRepository.deleteById(id);</span>
+<span class="nc bnc" id="L160" title="All 2 branches missed.">        boolean success = result &gt; 0;</span>
+        
+<span class="nc bnc" id="L162" title="All 2 branches missed.">        if (success) {</span>
+<span class="nc" id="L163">            log.info(&quot;删除产品成功: {}&quot;, product.getName());</span>
+        } else {
+<span class="nc" id="L165">            log.warn(&quot;删除产品失败: {}&quot;, id);</span>
+        }
+        
+<span class="nc" id="L168">        return success;</span>
+    }
+
+    @Override
+    @Transactional
+    public int batchDeleteProducts(List&lt;Long&gt; ids) {
+<span class="nc" id="L174">        log.info(&quot;批量删除产品，数量: {}&quot;, ids.size());</span>
+        
+<span class="nc bnc" id="L176" title="All 4 branches missed.">        if (ids == null || ids.isEmpty()) {</span>
+<span class="nc" id="L177">            return 0;</span>
+        }
+        
+<span class="nc" id="L180">        int result = adminProductRepository.deleteBatchIds(ids);</span>
+<span class="nc" id="L181">        log.info(&quot;批量删除产品完成，成功删除数量: {}&quot;, result);</span>
+<span class="nc" id="L182">        return result;</span>
+    }
+
+    @Override
+    @Transactional
+    public boolean updateProductStatus(Long id, Integer status) {
+<span class="nc" id="L188">        log.info(&quot;更新产品状态: {} -&gt; {}&quot;, id, status);</span>
+        
+<span class="nc" id="L190">        Product product = adminProductRepository.selectById(id);</span>
+<span class="nc bnc" id="L191" title="All 2 branches missed.">        if (product == null) {</span>
+<span class="nc" id="L192">            log.warn(&quot;更新产品状态失败，产品不存在: {}&quot;, id);</span>
+<span class="nc" id="L193">            return false;</span>
+        }
+        
+<span class="nc" id="L196">        LambdaUpdateWrapper&lt;Product&gt; updateWrapper = new LambdaUpdateWrapper&lt;&gt;();</span>
+<span class="nc" id="L197">        updateWrapper.eq(Product::getId, id)</span>
+<span class="nc" id="L198">                    .set(Product::getStatus, status);</span>
+        
+<span class="nc" id="L200">        int result = adminProductRepository.update(null, updateWrapper);</span>
+<span class="nc bnc" id="L201" title="All 2 branches missed.">        boolean success = result &gt; 0;</span>
+        
+<span class="nc bnc" id="L203" title="All 2 branches missed.">        if (success) {</span>
+<span class="nc" id="L204">            log.info(&quot;更新产品状态成功: {} -&gt; {}&quot;, id, status);</span>
+        } else {
+<span class="nc" id="L206">            log.warn(&quot;更新产品状态失败: {}&quot;, id);</span>
+        }
+        
+<span class="nc" id="L209">        return success;</span>
+    }
+
+    @Override
+    @Transactional
+    public int batchUpdateProductStatus(List&lt;Long&gt; ids, Integer status) {
+<span class="nc" id="L215">        log.info(&quot;批量更新产品状态，数量: {}, 状态: {}&quot;, ids.size(), status);</span>
+        
+<span class="nc bnc" id="L217" title="All 4 branches missed.">        if (ids == null || ids.isEmpty()) {</span>
+<span class="nc" id="L218">            return 0;</span>
+        }
+        
+<span class="nc" id="L221">        LambdaUpdateWrapper&lt;Product&gt; updateWrapper = new LambdaUpdateWrapper&lt;&gt;();</span>
+<span class="nc" id="L222">        updateWrapper.in(Product::getId, ids)</span>
+<span class="nc" id="L223">                    .set(Product::getStatus, status);</span>
+        
+<span class="nc" id="L225">        int result = adminProductRepository.update(null, updateWrapper);</span>
+<span class="nc" id="L226">        log.info(&quot;批量更新产品状态完成，成功更新数量: {}&quot;, result);</span>
+<span class="nc" id="L227">        return result;</span>
+    }
+
+    @Override
+    public org.springframework.data.domain.Page&lt;ProductDTO&gt; searchProducts(String keyword, String category, Integer status, 
+                                          Double minPrice, Double maxPrice, Pageable pageable) {
+<span class="nc" id="L233">        log.info(&quot;搜索产品，关键词: {}, 分类: {}, 状态: {}, 价格范围: {} - {}&quot;, </span>
+                keyword, category, status, minPrice, maxPrice);
+        
+<span class="nc" id="L236">        LambdaQueryWrapper&lt;Product&gt; queryWrapper = new LambdaQueryWrapper&lt;&gt;();</span>
+        
+        // 关键词搜索
+<span class="nc bnc" id="L239" title="All 2 branches missed.">        if (StringUtils.hasText(keyword)) {</span>
+<span class="nc" id="L240">            queryWrapper.and(wrapper -&gt; wrapper</span>
+<span class="nc" id="L241">                .like(Product::getName, keyword)</span>
+<span class="nc" id="L242">                .or()</span>
+<span class="nc" id="L243">                .like(Product::getDescription, keyword)</span>
+            );
+        }
+        
+        // 分类过滤
+<span class="nc bnc" id="L248" title="All 2 branches missed.">        if (StringUtils.hasText(category)) {</span>
+<span class="nc" id="L249">            queryWrapper.eq(Product::getCategory, Integer.valueOf(category));</span>
+        }
+        
+        // 状态过滤
+<span class="nc bnc" id="L253" title="All 2 branches missed.">        if (status != null) {</span>
+<span class="nc" id="L254">            queryWrapper.eq(Product::getStatus, status);</span>
+        }
+        
+        // 价格范围过滤
+<span class="nc bnc" id="L258" title="All 2 branches missed.">        if (minPrice != null) {</span>
+<span class="nc" id="L259">            queryWrapper.ge(Product::getPrice, minPrice);</span>
+        }
+<span class="nc bnc" id="L261" title="All 2 branches missed.">        if (maxPrice != null) {</span>
+<span class="nc" id="L262">            queryWrapper.le(Product::getPrice, maxPrice);</span>
+        }
+        
+        // 按创建时间降序排序
+<span class="nc" id="L266">        queryWrapper.orderByDesc(Product::getCreateTime);</span>
+        
+        // 分页查询
+<span class="nc" id="L269">        Page&lt;Product&gt; page = </span>
+            new Page&lt;&gt;(
+<span class="nc" id="L271">                pageable.getPageNumber() + 1,</span>
+<span class="nc" id="L272">                pageable.getPageSize()</span>
+            );
+        
+<span class="nc" id="L275">        Page&lt;Product&gt; productPage = adminProductRepository.selectPage(page, queryWrapper);</span>
+        
+        // 转换为DTO
+<span class="nc" id="L278">        List&lt;ProductDTO&gt; productDTOs = productPage.getRecords().stream()</span>
+<span class="nc" id="L279">            .map(this::convertToDTO)</span>
+<span class="nc" id="L280">            .collect(Collectors.toList());</span>
+        
+        // 转换为Spring Data的Page对象
+<span class="nc" id="L283">        org.springframework.data.domain.Page&lt;ProductDTO&gt; result = new PageImpl&lt;&gt;(productDTOs, pageable, productPage.getTotal());</span>
+        
+<span class="nc" id="L285">        log.info(&quot;搜索产品完成，总数: {}&quot;, productPage.getTotal());</span>
+<span class="nc" id="L286">        return result;</span>
+    }
+
+    @Override
+    public Object getProductStatistics() {
+<span class="nc" id="L291">        log.info(&quot;获取产品统计信息&quot;);</span>
+        
+<span class="nc" id="L293">        Map&lt;String, Object&gt; statistics = new HashMap&lt;&gt;();</span>
+        
+        // 总产品数
+<span class="nc" id="L296">        LambdaQueryWrapper&lt;Product&gt; totalWrapper = new LambdaQueryWrapper&lt;&gt;();</span>
+<span class="nc" id="L297">        Long totalCount = adminProductRepository.selectCount(totalWrapper);</span>
+<span class="nc" id="L298">        statistics.put(&quot;totalProducts&quot;, totalCount);</span>
+        
+        // 上架产品数
+<span class="nc" id="L301">        LambdaQueryWrapper&lt;Product&gt; activeWrapper = new LambdaQueryWrapper&lt;&gt;();</span>
+<span class="nc" id="L302">        activeWrapper.eq(Product::getStatus, 1);</span>
+<span class="nc" id="L303">        Long activeCount = adminProductRepository.selectCount(activeWrapper);</span>
+<span class="nc" id="L304">        statistics.put(&quot;activeProducts&quot;, activeCount);</span>
+        
+        // 下架产品数
+<span class="nc" id="L307">        LambdaQueryWrapper&lt;Product&gt; inactiveWrapper = new LambdaQueryWrapper&lt;&gt;();</span>
+<span class="nc" id="L308">        inactiveWrapper.eq(Product::getStatus, 0);</span>
+<span class="nc" id="L309">        Long inactiveCount = adminProductRepository.selectCount(inactiveWrapper);</span>
+<span class="nc" id="L310">        statistics.put(&quot;inactiveProducts&quot;, inactiveCount);</span>
+        
+        // 库存不足产品数
+<span class="nc" id="L313">        LambdaQueryWrapper&lt;Product&gt; lowStockWrapper = new LambdaQueryWrapper&lt;&gt;();</span>
+<span class="nc" id="L314">        lowStockWrapper.le(Product::getStock, LOW_STOCK_THRESHOLD);</span>
+<span class="nc" id="L315">        Long lowStockCount = adminProductRepository.selectCount(lowStockWrapper);</span>
+<span class="nc" id="L316">        statistics.put(&quot;lowStockProducts&quot;, lowStockCount);</span>
+        
+        // 今日新增产品数
+<span class="nc" id="L319">        statistics.put(&quot;todayNewProducts&quot;, getTodayNewProductCount());</span>
+        
+        // 本周新增产品数
+<span class="nc" id="L322">        statistics.put(&quot;weekNewProducts&quot;, getWeekNewProductCount());</span>
+        
+        // 本月新增产品数
+<span class="nc" id="L325">        statistics.put(&quot;monthNewProducts&quot;, getMonthNewProductCount());</span>
+        
+<span class="nc" id="L327">        log.info(&quot;获取产品统计信息完成&quot;);</span>
+<span class="nc" id="L328">        return statistics;</span>
+    }
+
+    @Override
+    public List&lt;ProductDTO&gt; getLowStockProducts(Integer threshold) {
+<span class="nc" id="L333">        log.info(&quot;获取库存不足产品，阈值: {}&quot;, threshold);</span>
+        
+<span class="nc bnc" id="L335" title="All 2 branches missed.">        if (threshold == null) {</span>
+<span class="nc" id="L336">            threshold = LOW_STOCK_THRESHOLD;</span>
+        }
+        
+<span class="nc" id="L339">        LambdaQueryWrapper&lt;Product&gt; queryWrapper = new LambdaQueryWrapper&lt;&gt;();</span>
+<span class="nc" id="L340">        queryWrapper.le(Product::getStock, threshold)</span>
+<span class="nc" id="L341">                   .eq(Product::getStatus, 1) // 只查询上架产品</span>
+<span class="nc" id="L342">                   .orderByAsc(Product::getStock);</span>
+        
+<span class="nc" id="L344">        List&lt;Product&gt; products = adminProductRepository.selectList(queryWrapper);</span>
+<span class="nc" id="L345">        List&lt;ProductDTO&gt; productDTOs = products.stream()</span>
+<span class="nc" id="L346">            .map(this::convertToDTO)</span>
+<span class="nc" id="L347">            .collect(Collectors.toList());</span>
+        
+<span class="nc" id="L349">        log.info(&quot;获取库存不足产品完成，数量: {}&quot;, productDTOs.size());</span>
+<span class="nc" id="L350">        return productDTOs;</span>
+    }
+
+    @Override
+    public List&lt;ProductDTO&gt; getTopSellingProducts(Integer limit) {
+<span class="nc" id="L355">        log.info(&quot;获取热销产品，限制: {}&quot;, limit);</span>
+        
+<span class="nc bnc" id="L357" title="All 2 branches missed.">        if (limit == null) {</span>
+<span class="nc" id="L358">            limit = 10; // 默认限制</span>
+        }
+        
+<span class="nc" id="L361">        LambdaQueryWrapper&lt;Product&gt; queryWrapper = new LambdaQueryWrapper&lt;&gt;();</span>
+<span class="nc" id="L362">        queryWrapper.eq(Product::getStatus, 1) // 只查询上架产品</span>
+<span class="nc" id="L363">                   .orderByDesc(Product::getSales)</span>
+<span class="nc" id="L364">                   .last(&quot;LIMIT &quot; + limit);</span>
+        
+<span class="nc" id="L366">        List&lt;Product&gt; products = adminProductRepository.selectList(queryWrapper);</span>
+<span class="nc" id="L367">        List&lt;ProductDTO&gt; productDTOs = products.stream()</span>
+<span class="nc" id="L368">            .map(this::convertToDTO)</span>
+<span class="nc" id="L369">            .collect(Collectors.toList());</span>
+        
+<span class="nc" id="L371">        log.info(&quot;获取热销产品完成，数量: {}&quot;, productDTOs.size());</span>
+<span class="nc" id="L372">        return productDTOs;</span>
+    }
+
+    @Override
+    public List&lt;Map&lt;String, Object&gt;&gt; getProductCategories() {
+<span class="nc" id="L377">        log.info(&quot;获取产品分类列表&quot;);</span>
+        
+        // 创建所有可能的分类，而不仅仅是已使用的
+<span class="nc" id="L380">        List&lt;Map&lt;String, Object&gt;&gt; categories = new ArrayList&lt;&gt;();</span>
+        
+<span class="nc" id="L382">        Map&lt;String, Object&gt; category1 = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L383">        category1.put(&quot;id&quot;, 1);</span>
+<span class="nc" id="L384">        category1.put(&quot;name&quot;, &quot;电子产品&quot;);</span>
+<span class="nc" id="L385">        categories.add(category1);</span>
+        
+<span class="nc" id="L387">        Map&lt;String, Object&gt; category2 = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L388">        category2.put(&quot;id&quot;, 2);</span>
+<span class="nc" id="L389">        category2.put(&quot;name&quot;, &quot;服装&quot;);</span>
+<span class="nc" id="L390">        categories.add(category2);</span>
+        
+<span class="nc" id="L392">        Map&lt;String, Object&gt; category3 = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L393">        category3.put(&quot;id&quot;, 3);</span>
+<span class="nc" id="L394">        category3.put(&quot;name&quot;, &quot;食品&quot;);</span>
+<span class="nc" id="L395">        categories.add(category3);</span>
+        
+<span class="nc" id="L397">        Map&lt;String, Object&gt; category4 = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L398">        category4.put(&quot;id&quot;, 4);</span>
+<span class="nc" id="L399">        category4.put(&quot;name&quot;, &quot;图书&quot;);</span>
+<span class="nc" id="L400">        categories.add(category4);</span>
+        
+<span class="nc" id="L402">        Map&lt;String, Object&gt; category5 = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L403">        category5.put(&quot;id&quot;, 5);</span>
+<span class="nc" id="L404">        category5.put(&quot;name&quot;, &quot;其他&quot;);</span>
+<span class="nc" id="L405">        categories.add(category5);</span>
+        
+<span class="nc" id="L407">        log.info(&quot;获取产品分类列表完成，数量: {}&quot;, categories.size());</span>
+<span class="nc" id="L408">        return categories;</span>
+    }
+
+    @Override
+    @Transactional
+    public boolean updateProductStock(Long id, Integer stock) {
+<span class="nc" id="L414">        log.info(&quot;更新产品库存: {} -&gt; {}&quot;, id, stock);</span>
+        
+<span class="nc" id="L416">        Product product = adminProductRepository.selectById(id);</span>
+<span class="nc bnc" id="L417" title="All 2 branches missed.">        if (product == null) {</span>
+<span class="nc" id="L418">            log.warn(&quot;更新产品库存失败，产品不存在: {}&quot;, id);</span>
+<span class="nc" id="L419">            return false;</span>
+        }
+        
+<span class="nc" id="L422">        LambdaUpdateWrapper&lt;Product&gt; updateWrapper = new LambdaUpdateWrapper&lt;&gt;();</span>
+<span class="nc" id="L423">        updateWrapper.eq(Product::getId, id)</span>
+<span class="nc" id="L424">                    .set(Product::getStock, stock);</span>
+        
+<span class="nc" id="L426">        int result = adminProductRepository.update(null, updateWrapper);</span>
+<span class="nc bnc" id="L427" title="All 2 branches missed.">        boolean success = result &gt; 0;</span>
+        
+<span class="nc bnc" id="L429" title="All 2 branches missed.">        if (success) {</span>
+<span class="nc" id="L430">            log.info(&quot;更新产品库存成功: {} -&gt; {}&quot;, id, stock);</span>
+        } else {
+<span class="nc" id="L432">            log.warn(&quot;更新产品库存失败: {}&quot;, id);</span>
+        }
+        
+<span class="nc" id="L435">        return success;</span>
+    }
+
+    @Override
+    @Transactional
+    public int batchUpdateProductStock(List&lt;Map&lt;String, Object&gt;&gt; stockUpdates) {
+<span class="nc" id="L441">        log.info(&quot;批量更新产品库存，数量: {}&quot;, stockUpdates.size());</span>
+        
+<span class="nc bnc" id="L443" title="All 4 branches missed.">        if (stockUpdates == null || stockUpdates.isEmpty()) {</span>
+<span class="nc" id="L444">            return 0;</span>
+        }
+        
+<span class="nc" id="L447">        int successCount = 0;</span>
+<span class="nc bnc" id="L448" title="All 2 branches missed.">        for (Map&lt;String, Object&gt; update : stockUpdates) {</span>
+<span class="nc" id="L449">            Long id = Long.valueOf(update.get(&quot;id&quot;).toString());</span>
+<span class="nc" id="L450">            Integer stock = Integer.valueOf(update.get(&quot;stock&quot;).toString());</span>
+            
+<span class="nc bnc" id="L452" title="All 2 branches missed.">            if (updateProductStock(id, stock)) {</span>
+<span class="nc" id="L453">                successCount++;</span>
+            }
+<span class="nc" id="L455">        }</span>
+        
+<span class="nc" id="L457">        log.info(&quot;批量更新产品库存完成，成功更新数量: {}&quot;, successCount);</span>
+<span class="nc" id="L458">        return successCount;</span>
+    }
+
+    @Override
+    public boolean existsByName(String name, Long excludeId) {
+<span class="nc" id="L463">        LambdaQueryWrapper&lt;Product&gt; queryWrapper = new LambdaQueryWrapper&lt;&gt;();</span>
+<span class="nc" id="L464">        queryWrapper.eq(Product::getName, name);</span>
+<span class="nc bnc" id="L465" title="All 2 branches missed.">        if (excludeId != null) {</span>
+<span class="nc" id="L466">            queryWrapper.ne(Product::getId, excludeId);</span>
+        }
+        
+<span class="nc" id="L469">        Long count = adminProductRepository.selectCount(queryWrapper);</span>
+<span class="nc bnc" id="L470" title="All 2 branches missed.">        return count &gt; 0;</span>
+    }
+
+    @Override
+    public boolean existsByCode(String code, Long excludeId) {
+<span class="nc" id="L475">        LambdaQueryWrapper&lt;Product&gt; queryWrapper = new LambdaQueryWrapper&lt;&gt;();</span>
+<span class="nc" id="L476">        queryWrapper.eq(Product::getCode, code);</span>
+<span class="nc bnc" id="L477" title="All 2 branches missed.">        if (excludeId != null) {</span>
+<span class="nc" id="L478">            queryWrapper.ne(Product::getId, excludeId);</span>
+        }
+        
+<span class="nc" id="L481">        Long count = adminProductRepository.selectCount(queryWrapper);</span>
+<span class="nc bnc" id="L482" title="All 2 branches missed.">        return count &gt; 0;</span>
+    }
+
+    @Override
+    public long getTodayNewProductCount() {
+<span class="nc" id="L487">        LocalDateTime todayStart = LocalDate.now().atStartOfDay();</span>
+<span class="nc" id="L488">        LocalDateTime todayEnd = LocalDateTime.of(LocalDate.now(), LocalTime.MAX);</span>
+        
+<span class="nc" id="L490">        LambdaQueryWrapper&lt;Product&gt; queryWrapper = new LambdaQueryWrapper&lt;&gt;();</span>
+<span class="nc" id="L491">        queryWrapper.between(Product::getCreateTime, todayStart, todayEnd);</span>
+        
+<span class="nc" id="L493">        return adminProductRepository.selectCount(queryWrapper);</span>
+    }
+
+    @Override
+    public long getWeekNewProductCount() {
+<span class="nc" id="L498">        LocalDateTime weekStart = LocalDate.now().minusDays(7).atStartOfDay();</span>
+<span class="nc" id="L499">        LocalDateTime weekEnd = LocalDateTime.of(LocalDate.now(), LocalTime.MAX);</span>
+        
+<span class="nc" id="L501">        LambdaQueryWrapper&lt;Product&gt; queryWrapper = new LambdaQueryWrapper&lt;&gt;();</span>
+<span class="nc" id="L502">        queryWrapper.between(Product::getCreateTime, weekStart, weekEnd);</span>
+        
+<span class="nc" id="L504">        return adminProductRepository.selectCount(queryWrapper);</span>
+    }
+
+    @Override
+    public long getMonthNewProductCount() {
+<span class="nc" id="L509">        LocalDateTime monthStart = LocalDate.now().minusDays(30).atStartOfDay();</span>
+<span class="nc" id="L510">        LocalDateTime monthEnd = LocalDateTime.of(LocalDate.now(), LocalTime.MAX);</span>
+        
+<span class="nc" id="L512">        LambdaQueryWrapper&lt;Product&gt; queryWrapper = new LambdaQueryWrapper&lt;&gt;();</span>
+<span class="nc" id="L513">        queryWrapper.between(Product::getCreateTime, monthStart, monthEnd);</span>
+        
+<span class="nc" id="L515">        return adminProductRepository.selectCount(queryWrapper);</span>
+    }
+
+    @Override
+    public List&lt;ProductDTO&gt; exportProducts() {
+<span class="nc" id="L520">        log.info(&quot;导出产品数据&quot;);</span>
+        
+<span class="nc" id="L522">        LambdaQueryWrapper&lt;Product&gt; queryWrapper = new LambdaQueryWrapper&lt;&gt;();</span>
+<span class="nc" id="L523">        queryWrapper.orderByDesc(Product::getCreateTime);</span>
+        
+<span class="nc" id="L525">        List&lt;Product&gt; products = adminProductRepository.selectList(queryWrapper);</span>
+<span class="nc" id="L526">        List&lt;ProductDTO&gt; productDTOs = products.stream()</span>
+<span class="nc" id="L527">            .map(this::convertToDTO)</span>
+<span class="nc" id="L528">            .collect(Collectors.toList());</span>
+        
+<span class="nc" id="L530">        log.info(&quot;导出产品数据完成，数量: {}&quot;, productDTOs.size());</span>
+<span class="nc" id="L531">        return productDTOs;</span>
+    }
+
+    @Override
+    @Transactional
+    public ProductDTO copyProduct(Long id, String newName) {
+<span class="nc" id="L537">        log.info(&quot;复制产品: {} -&gt; {}&quot;, id, newName);</span>
+        
+<span class="nc" id="L539">        Product originalProduct = adminProductRepository.selectById(id);</span>
+<span class="nc bnc" id="L540" title="All 2 branches missed.">        if (originalProduct == null) {</span>
+<span class="nc" id="L541">            throw new RuntimeException(&quot;原产品不存在: &quot; + id);</span>
+        }
+        
+        // 检查新产品名称是否已存在
+<span class="nc bnc" id="L545" title="All 2 branches missed.">        if (existsByName(newName, null)) {</span>
+<span class="nc" id="L546">            throw new RuntimeException(&quot;产品名称已存在: &quot; + newName);</span>
+        }
+        
+<span class="nc" id="L549">        Product newProduct = new Product();</span>
+<span class="nc" id="L550">        BeanUtils.copyProperties(originalProduct, newProduct, &quot;id&quot;, &quot;createTime&quot;, &quot;salesCount&quot;);</span>
+        
+<span class="nc" id="L552">        newProduct.setName(newName);</span>
+<span class="nc" id="L553">        newProduct.setStatus(0); // 复制的产品默认为下架状态</span>
+<span class="nc" id="L554">        newProduct.setSales(0);</span>
+        
+<span class="nc" id="L556">        adminProductRepository.insert(newProduct);</span>
+        
+<span class="nc" id="L558">        ProductDTO productDTO = convertToDTO(newProduct);</span>
+<span class="nc" id="L559">        log.info(&quot;复制产品成功: {}&quot;, newProduct.getName());</span>
+<span class="nc" id="L560">        return productDTO;</span>
+    }
+
+    @Override
+    public List&lt;Map&lt;String, Object&gt;&gt; quickSearchProducts(String keyword, Integer limit) {
+<span class="nc" id="L565">        log.info(&quot;快速搜索产品，关键词: {}, 限制: {}&quot;, keyword, limit);</span>
+        
+<span class="nc bnc" id="L567" title="All 2 branches missed.">        if (limit == null) {</span>
+<span class="nc" id="L568">            limit = 10; // 默认限制</span>
+        }
+        
+<span class="nc" id="L571">        LambdaQueryWrapper&lt;Product&gt; queryWrapper = new LambdaQueryWrapper&lt;&gt;();</span>
+<span class="nc" id="L572">        queryWrapper.eq(Product::getStatus, 1) // 只查询上架产品</span>
+<span class="nc" id="L573">                   .and(StringUtils.hasText(keyword), w -&gt; w</span>
+<span class="nc" id="L574">                       .like(Product::getName, keyword)</span>
+                   )
+<span class="nc" id="L576">                   .orderByDesc(Product::getSales)</span>
+<span class="nc" id="L577">                   .last(&quot;LIMIT &quot; + limit);</span>
+        
+<span class="nc" id="L579">        List&lt;Product&gt; products = adminProductRepository.selectList(queryWrapper);</span>
+        
+        // 转换为简化的Map格式
+<span class="nc" id="L582">        List&lt;Map&lt;String, Object&gt;&gt; result = products.stream()</span>
+<span class="nc" id="L583">            .map(product -&gt; {</span>
+<span class="nc" id="L584">                Map&lt;String, Object&gt; map = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L585">                map.put(&quot;id&quot;, product.getId());</span>
+<span class="nc" id="L586">                map.put(&quot;name&quot;, product.getName());</span>
+<span class="nc" id="L587">                map.put(&quot;price&quot;, product.getPrice());</span>
+<span class="nc" id="L588">                map.put(&quot;stock&quot;, product.getStock());</span>
+<span class="nc" id="L589">                return map;</span>
+            })
+<span class="nc" id="L591">            .collect(Collectors.toList());</span>
+        
+<span class="nc" id="L593">        log.info(&quot;快速搜索产品完成，数量: {}&quot;, result.size());</span>
+<span class="nc" id="L594">        return result;</span>
+    }
+
+    /**
+     * 将Product实体转换为ProductDTO
+     */
+    private ProductDTO convertToDTO(Product product) {
+<span class="nc" id="L601">        ProductDTO dto = new ProductDTO();</span>
+<span class="nc" id="L602">        BeanUtils.copyProperties(product, dto);</span>
+<span class="nc" id="L603">        return dto;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

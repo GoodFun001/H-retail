@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RedisUtil.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">retail-platform</a> &gt; <a href="index.source.html" class="el_package">com.retail.util</a> &gt; <span class="el_source">RedisUtil.java</span></div><h1>RedisUtil.java</h1><pre class="source lang-java linenums">package com.retail.util;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Component;
+
+import java.util.concurrent.TimeUnit;
+
+/**
+ * Redis工具类
+ */
+<span class="nc" id="L14">@Slf4j</span>
+@Component
+<span class="nc" id="L16">public class RedisUtil {</span>
+
+    @Autowired
+    private RedisTemplate&lt;String, Object&gt; redisTemplate;
+
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
+    /**
+     * 设置缓存
+     */
+    public void set(String key, Object value) {
+        try {
+<span class="nc" id="L29">            redisTemplate.opsForValue().set(key, value);</span>
+<span class="nc" id="L30">        } catch (Exception e) {</span>
+<span class="nc" id="L31">            log.error(&quot;Redis设置失败: key={}, error={}&quot;, key, e.getMessage());</span>
+<span class="nc" id="L32">        }</span>
+<span class="nc" id="L33">    }</span>
+
+    /**
+     * 设置缓存并指定过期时间
+     */
+    public void set(String key, Object value, long timeout, TimeUnit unit) {
+        try {
+<span class="nc" id="L40">            redisTemplate.opsForValue().set(key, value, timeout, unit);</span>
+<span class="nc" id="L41">        } catch (Exception e) {</span>
+<span class="nc" id="L42">            log.error(&quot;Redis设置失败: key={}, error={}&quot;, key, e.getMessage());</span>
+<span class="nc" id="L43">        }</span>
+<span class="nc" id="L44">    }</span>
+
+    /**
+     * 设置字符串缓存
+     */
+    public void setString(String key, String value) {
+        try {
+<span class="nc" id="L51">            stringRedisTemplate.opsForValue().set(key, value);</span>
+<span class="nc" id="L52">        } catch (Exception e) {</span>
+<span class="nc" id="L53">            log.error(&quot;Redis设置失败: key={}, error={}&quot;, key, e.getMessage());</span>
+<span class="nc" id="L54">        }</span>
+<span class="nc" id="L55">    }</span>
+
+    /**
+     * 设置字符串缓存并指定过期时间
+     */
+    public void setString(String key, String value, long timeout, TimeUnit unit) {
+        try {
+<span class="nc" id="L62">            stringRedisTemplate.opsForValue().set(key, value, timeout, unit);</span>
+<span class="nc" id="L63">        } catch (Exception e) {</span>
+<span class="nc" id="L64">            log.error(&quot;Redis设置失败: key={}, error={}&quot;, key, e.getMessage());</span>
+<span class="nc" id="L65">        }</span>
+<span class="nc" id="L66">    }</span>
+
+    /**
+     * 获取缓存
+     */
+    public Object get(String key) {
+        try {
+<span class="nc" id="L73">            return redisTemplate.opsForValue().get(key);</span>
+<span class="nc" id="L74">        } catch (Exception e) {</span>
+<span class="nc" id="L75">            log.error(&quot;Redis获取失败: key={}, error={}&quot;, key, e.getMessage());</span>
+<span class="nc" id="L76">            return null;</span>
+        }
+    }
+
+    /**
+     * 获取字符串缓存
+     */
+    public String getString(String key) {
+        try {
+<span class="nc" id="L85">            return stringRedisTemplate.opsForValue().get(key);</span>
+<span class="nc" id="L86">        } catch (Exception e) {</span>
+<span class="nc" id="L87">            log.error(&quot;Redis获取失败: key={}, error={}&quot;, key, e.getMessage());</span>
+<span class="nc" id="L88">            return null;</span>
+        }
+    }
+
+    /**
+     * 删除缓存
+     */
+    public Boolean delete(String key) {
+        try {
+<span class="nc" id="L97">            return redisTemplate.delete(key);</span>
+<span class="nc" id="L98">        } catch (Exception e) {</span>
+<span class="nc" id="L99">            log.error(&quot;Redis删除失败: key={}, error={}&quot;, key, e.getMessage());</span>
+<span class="nc" id="L100">            return false;</span>
+        }
+    }
+
+    /**
+     * 判断缓存是否存在
+     */
+    public Boolean hasKey(String key) {
+        try {
+<span class="nc" id="L109">            return redisTemplate.hasKey(key);</span>
+<span class="nc" id="L110">        } catch (Exception e) {</span>
+<span class="nc" id="L111">            log.error(&quot;Redis判断key存在失败: key={}, error={}&quot;, key, e.getMessage());</span>
+<span class="nc" id="L112">            return false;</span>
+        }
+    }
+
+    /**
+     * 设置过期时间
+     */
+    public Boolean expire(String key, long timeout, TimeUnit unit) {
+        try {
+<span class="nc" id="L121">            return redisTemplate.expire(key, timeout, unit);</span>
+<span class="nc" id="L122">        } catch (Exception e) {</span>
+<span class="nc" id="L123">            log.error(&quot;Redis设置过期时间失败: key={}, error={}&quot;, key, e.getMessage());</span>
+<span class="nc" id="L124">            return false;</span>
+        }
+    }
+
+    /**
+     * 获取过期时间
+     */
+    public Long getExpire(String key) {
+        try {
+<span class="nc" id="L133">            return redisTemplate.getExpire(key, TimeUnit.SECONDS);</span>
+<span class="nc" id="L134">        } catch (Exception e) {</span>
+<span class="nc" id="L135">            log.error(&quot;Redis获取过期时间失败: key={}, error={}&quot;, key, e.getMessage());</span>
+<span class="nc" id="L136">            return -1L;</span>
+        }
+    }
+
+    /**
+     * 递增
+     */
+    public Long increment(String key) {
+        try {
+<span class="nc" id="L145">            return stringRedisTemplate.opsForValue().increment(key);</span>
+<span class="nc" id="L146">        } catch (Exception e) {</span>
+<span class="nc" id="L147">            log.error(&quot;Redis递增失败: key={}, error={}&quot;, key, e.getMessage());</span>
+<span class="nc" id="L148">            return 0L;</span>
+        }
+    }
+
+    /**
+     * 递增指定步长
+     */
+    public Long increment(String key, long delta) {
+        try {
+<span class="nc" id="L157">            return stringRedisTemplate.opsForValue().increment(key, delta);</span>
+<span class="nc" id="L158">        } catch (Exception e) {</span>
+<span class="nc" id="L159">            log.error(&quot;Redis递增失败: key={}, delta={}, error={}&quot;, key, delta, e.getMessage());</span>
+<span class="nc" id="L160">            return 0L;</span>
+        }
+    }
+
+    /**
+     * 递减
+     */
+    public Long decrement(String key) {
+        try {
+<span class="nc" id="L169">            return stringRedisTemplate.opsForValue().decrement(key);</span>
+<span class="nc" id="L170">        } catch (Exception e) {</span>
+<span class="nc" id="L171">            log.error(&quot;Redis递减失败: key={}, error={}&quot;, key, e.getMessage());</span>
+<span class="nc" id="L172">            return 0L;</span>
+        }
+    }
+
+    /**
+     * 递减指定步长
+     */
+    public Long decrement(String key, long delta) {
+        try {
+<span class="nc" id="L181">            return stringRedisTemplate.opsForValue().decrement(key, delta);</span>
+<span class="nc" id="L182">        } catch (Exception e) {</span>
+<span class="nc" id="L183">            log.error(&quot;Redis递减失败: key={}, delta={}, error={}&quot;, key, delta, e.getMessage());</span>
+<span class="nc" id="L184">            return 0L;</span>
+        }
+    }
+
+    /**
+     * 原子性扣减库存
+     * @param key 库存key
+     * @param num 扣减数量
+     * @return 剩余库存数量
+     */
+    public Long deductStock(String key, Integer num) {
+        try {
+<span class="nc" id="L196">            Long remainStock = stringRedisTemplate.opsForValue().decrement(key, num);</span>
+<span class="nc" id="L197">            return remainStock;</span>
+<span class="nc" id="L198">        } catch (Exception e) {</span>
+<span class="nc" id="L199">            log.error(&quot;Redis扣减库存失败: key={}, num={}, error={}&quot;, key, num, e.getMessage());</span>
+<span class="nc" id="L200">            return null;</span>
+        }
+    }
+
+    /**
+     * 原子性增加库存
+     * @param key 库存key
+     * @param num 增加数量
+     * @return 剩余库存数量
+     */
+    public Long addStock(String key, Integer num) {
+        try {
+<span class="nc" id="L212">            Long remainStock = stringRedisTemplate.opsForValue().increment(key, num);</span>
+<span class="nc" id="L213">            return remainStock;</span>
+<span class="nc" id="L214">        } catch (Exception e) {</span>
+<span class="nc" id="L215">            log.error(&quot;Redis增加库存失败: key={}, num={}, error={}&quot;, key, num, e.getMessage());</span>
+<span class="nc" id="L216">            return null;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

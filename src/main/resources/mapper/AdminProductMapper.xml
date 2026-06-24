@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.retail.mapper.AdminProductMapper">
+    <resultMap id="BaseResultMap" type="com.retail.entity.Product">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="description" property="description" jdbcType="VARCHAR"/>
+        <result column="price" property="price" jdbcType="DECIMAL"/>
+        <result column="stock" property="stock" jdbcType="INTEGER"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="deleted" property="deleted" jdbcType="INTEGER"/>
+    </resultMap>
+    
+    <select id="selectProductListWithPage" resultMap="BaseResultMap">
+        SELECT id, name, description, price, stock, status, create_time, update_time, deleted
+        FROM product
+        <where>
+            <!-- 核心修正1：把 deleted = 0 移到 where 标签内，避免 AND 语法错误 -->
+            deleted = 0
+            <if test="keyword != null and keyword != ''">
+                AND name LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+            <if test="minPrice != null">
+                AND price &gt;= #{minPrice}
+            </if>
+            <if test="maxPrice != null">
+                AND price &lt;= #{maxPrice}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+    
+    <delete id="batchDeleteProducts">
+        DELETE FROM product
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+        <!-- 核心修正2：物理删除时增加 deleted 条件，避免误删已逻辑删除的数据 -->
+        AND deleted = 0
+    </delete>
+    
+    <update id="batchUpdateProductStatus">
+        UPDATE product 
+        SET status = #{status},
+            <!-- 核心修正3：更新时同步更新 update_time -->
+            update_time = NOW()
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+        <!-- 核心修正4：增加 deleted 条件，避免更新已逻辑删除的数据 -->
+        AND deleted = 0
+    </update>
+</mapper>

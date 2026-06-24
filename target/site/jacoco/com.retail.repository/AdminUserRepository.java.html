@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AdminUserRepository.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">retail-platform</a> &gt; <a href="index.source.html" class="el_package">com.retail.repository</a> &gt; <span class="el_source">AdminUserRepository.java</span></div><h1>AdminUserRepository.java</h1><pre class="source lang-java linenums">package com.retail.repository;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.retail.dto.UserSearchDTO;
+import com.retail.entity.User;
+import com.retail.mapper.AdminUserMapper;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 管理员用户Repository层
+ * 封装AdminUserMapper的数据访问操作，提供业务语义化的数据查询方法
+ */
+<span class="nc" id="L20">@Slf4j</span>
+@Repository
+<span class="nc" id="L22">@RequiredArgsConstructor</span>
+public class AdminUserRepository {
+
+    private final AdminUserMapper adminUserMapper;
+
+    /**
+     * 根据ID查询用户
+     */
+    public User findById(Long id) {
+<span class="nc" id="L31">        return adminUserMapper.selectById(id);</span>
+    }
+
+    /**
+     * 根据ID查询用户（别名，兼容旧代码）
+     */
+    public User selectById(Long id) {
+<span class="nc" id="L38">        return findById(id);</span>
+    }
+
+    /**
+     * 保存用户
+     */
+    public int insert(User user) {
+<span class="nc" id="L45">        return adminUserMapper.insert(user);</span>
+    }
+
+    /**
+     * 更新用户
+     */
+    public int update(User user) {
+<span class="nc" id="L52">        return adminUserMapper.updateById(user);</span>
+    }
+
+    /**
+     * 更新用户（别名，兼容旧代码）
+     */
+    public int updateById(User user) {
+<span class="nc" id="L59">        return adminUserMapper.updateById(user);</span>
+    }
+
+    /**
+     * 根据ID删除用户
+     */
+    public int deleteById(Long id) {
+<span class="nc" id="L66">        return adminUserMapper.deleteById(id);</span>
+    }
+
+    /**
+     * 分页查询用户列表
+     */
+    public IPage&lt;User&gt; selectPage(Page&lt;User&gt; page, LambdaQueryWrapper&lt;User&gt; wrapper) {
+<span class="nc" id="L73">        return adminUserMapper.selectPage(page, wrapper);</span>
+    }
+
+    /**
+     * 条件查询用户列表
+     */
+    public List&lt;User&gt; selectList(LambdaQueryWrapper&lt;User&gt; wrapper) {
+<span class="nc" id="L80">        return adminUserMapper.selectList(wrapper);</span>
+    }
+
+    /**
+     * 分页查询用户列表（使用自定义SQL）
+     */
+    public IPage&lt;User&gt; selectUserListWithPage(Page&lt;User&gt; page, String keyword, String role, Integer status) {
+<span class="nc" id="L87">        return adminUserMapper.selectUserListWithPage(page, keyword, role, status);</span>
+    }
+
+    /**
+     * 按条件查询用户列表（DTO方式）
+     */
+    public List&lt;User&gt; selectUserList(UserSearchDTO searchDTO) {
+<span class="nc" id="L94">        return adminUserMapper.selectUserList(searchDTO);</span>
+    }
+
+    /**
+     * 批量删除用户
+     */
+    public int batchDeleteUsers(List&lt;Long&gt; ids) {
+<span class="nc" id="L101">        return adminUserMapper.batchDeleteUsers(ids);</span>
+    }
+
+    /**
+     * 批量更新用户状态
+     */
+    public int updateUserStatus(List&lt;Long&gt; ids, Integer status) {
+<span class="nc" id="L108">        return adminUserMapper.updateUserStatus(ids, status);</span>
+    }
+
+    /**
+     * 统计用户总数
+     */
+    public Long countTotalUsers() {
+<span class="nc" id="L115">        return adminUserMapper.countTotalUsers();</span>
+    }
+
+    /**
+     * 统计活跃用户数
+     */
+    public Long countActiveUsers() {
+<span class="nc" id="L122">        return adminUserMapper.countActiveUsers();</span>
+    }
+
+    /**
+     * 统计今日新增用户数
+     */
+    public Long countTodayNewUsers() {
+<span class="nc" id="L129">        return adminUserMapper.countTodayNewUsers();</span>
+    }
+
+    /**
+     * 按角色统计用户数
+     */
+    public List&lt;Map&lt;String, Object&gt;&gt; countUsersByRole() {
+<span class="nc" id="L136">        return adminUserMapper.countUsersByRole();</span>
+    }
+
+    /**
+     * 按状态统计用户数
+     */
+    public List&lt;Map&lt;String, Object&gt;&gt; countUsersByStatus() {
+<span class="nc" id="L143">        return adminUserMapper.countUsersByStatus();</span>
+    }
+
+    /**
+     * 更新用户状态
+     */
+    public int updateStatus(Long id, Integer status) {
+<span class="nc" id="L150">        return adminUserMapper.updateStatus(id, status);</span>
+    }
+
+    /**
+     * 更新用户角色
+     */
+    public int updateRole(Long id, Integer role) {
+<span class="nc" id="L157">        return adminUserMapper.updateRole(id, role);</span>
+    }
+
+    /**
+     * 更新用户密码
+     */
+    public int updatePassword(Long id, String password) {
+<span class="nc" id="L164">        return adminUserMapper.updatePassword(id, password);</span>
+    }
+
+    /**
+     * 检查用户名是否存在
+     */
+    public boolean existsByUsername(String username) {
+<span class="nc" id="L171">        return adminUserMapper.existsByUsername(username);</span>
+    }
+
+    /**
+     * 检查邮箱是否存在
+     */
+    public boolean existsByEmail(String email) {
+<span class="nc" id="L178">        return adminUserMapper.existsByEmail(email);</span>
+    }
+
+    /**
+     * 快速搜索用户
+     */
+    public List&lt;User&gt; quickSearchUsers(String keyword, Integer limit) {
+<span class="nc" id="L185">        return adminUserMapper.quickSearchUsers(keyword, limit);</span>
+    }
+
+    /**
+     * 统计管理员用户数
+     */
+    public long countAdminUsers() {
+<span class="nc" id="L192">        return adminUserMapper.countAdminUsers();</span>
+    }
+
+    /**
+     * 统计VIP用户数
+     */
+    public long countVipUsers() {
+<span class="nc" id="L199">        return adminUserMapper.countVipUsers();</span>
+    }
+
+    /**
+     * 查询所有用户（无条件）
+     */
+    public List&lt;User&gt; findAll() {
+<span class="nc" id="L206">        return adminUserMapper.selectList(null);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

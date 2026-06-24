@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.retail.mapper.OrderMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.retail.entity.Order">
+        <id column="id" property="id"/>
+        <result column="order_no" property="orderNo"/>
+        <result column="user_id" property="userId"/>
+        <result column="product_id" property="productId"/>
+        <result column="product_name" property="productName"/>
+        <result column="product_price" property="productPrice"/>
+        <result column="quantity" property="quantity"/>
+        <result column="total_amount" property="totalAmount"/>
+        <result column="pay_amount" property="payAmount"/>
+        <result column="status" property="status"/>
+        <result column="pay_method" property="payMethod"/>
+        <result column="pay_time" property="payTime"/>
+        <result column="address" property="address"/>
+        <result column="phone" property="phone"/>
+        <result column="receiver_name" property="receiverName"/>
+        <result column="remark" property="remark"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="deleted" property="deleted"/>
+    </resultMap>
+
+    <!-- 创建订单 -->
+    <insert id="createOrder" parameterType="com.retail.entity.Order" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO order_info (
+            order_no, user_id, product_id, product_name, product_price, 
+            quantity, total_amount, pay_amount, status, pay_method, 
+            address, phone, receiver_name, remark, create_time, update_time
+        ) VALUES (
+            #{orderNo}, #{userId}, #{productId}, #{productName}, #{productPrice}, 
+            #{quantity}, #{totalAmount}, #{payAmount}, #{status}, #{payMethod}, 
+            #{address}, #{phone}, #{receiverName}, #{remark}, #{createTime}, #{updateTime}
+        )
+    </insert>
+
+    <!-- 根据ID查询订单 -->
+    <select id="getOrderById" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT * FROM order_info WHERE id = #{id} AND deleted = 0
+    </select>
+
+    <!-- 根据用户ID查询订单列表 -->
+    <select id="getOrdersByUserId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT * FROM order_info WHERE user_id = #{userId} AND deleted = 0 ORDER BY create_time DESC
+    </select>
+
+    <!-- 更新订单状态 -->
+    <update id="updateOrderStatus">
+        UPDATE order_info SET status = #{status}, update_time = NOW() WHERE id = #{id} AND deleted = 0
+    </update>
+
+    <!-- 删除订单 -->
+    <update id="deleteOrder" parameterType="java.lang.Long">
+        UPDATE order_info SET deleted = 1, update_time = NOW() WHERE id = #{id} AND deleted = 0
+    </update>
+
+    <!-- 查询所有订单 -->
+    <select id="getAllOrders" resultMap="BaseResultMap">
+        SELECT * FROM order_info WHERE deleted = 0 ORDER BY create_time DESC
+    </select>
+
+</mapper>
